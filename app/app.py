@@ -1,6 +1,9 @@
 import client_info
+from models.playlist import Playlist
+from models.track import Track
+from models.playlist_track import PlaylistTrack
 
-from flask import Flask, Blueprint, request, redirect
+from flask import Flask, Blueprint, request, redirect, render_template
 import base64
 import random
 import requests
@@ -8,13 +11,18 @@ import string
 import urllib
 import json
 
+import pdb
+
 app = Flask(__name__)
 blueprint = Blueprint('spotify_api', __name__)
 
 api_url_base = 'https://api.spotify.com/v1/{endpoint}'
 redirect_uri = 'http://localhost:5000/callback'
+access_token = None
+refresh_token = None
 
 
+@blueprint.route('/login', methods=['GET'])
 def login():
     url = 'https://accounts.spotify.com/authorize?'
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
@@ -28,6 +36,7 @@ def login():
     }
     # response = requests.get(url, params=auth_dict)
     redirect_str = url + urllib.urlencode(auth_dict)
+    print("REDIRECTING TO: " + redirect_str)
     return redirect(redirect_str)
 
 
@@ -47,23 +56,70 @@ def callback():
             'grant_type': 'authorization_code',
         }
         response = requests.post(url, data=auth_dict, headers=token_header, json=True)
+        response_content = json.loads(response.content)
+        access_token = response_content.get('access_token')
+        refresh_token = response_content.get('refresh_token')
 
         if response.status_code == 200:
-            return response
+            return home(access_token)
         else:
             raise Exception(response)
 
-def get_playlists(auth_response):
-    response_content = json.loads(auth_response.content)
 
-    access_token = response_content.get('access_token')
-    refresh_token = response_content.get('refresh_token')
+def home(token):
+    return render_template('index.html', token=token)
 
+
+@blueprint.route('/get_playlists')
+def get_playlists():
     get_playlist_endpoint = 'me/playlists'
+    access_token = request.args.get('token')
     me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
     response = requests.get(api_url_base.format(endpoint=get_playlist_endpoint),
                             headers=me_headers,
                             json=True)
-    return json.loads(response.text)
+    playlists_data = json.loads(response.text)
+    playlists = []
+    for playlist in playlists_data['items']:
+        playlists.append(Playlist(playlist))
+    playlist_info_list = []
+    """
+    for playlist in playlists:
+        playlist_info_list.append(get_playlist(playlist.href, access_token))
+    """
+    return str(get_playlist(playlists[0], access_token))
+
+
+def get_playlist(playlist, access_token):
+    me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
+    response = requests.get(playlist.href, headers=me_headers, json=True)
+    playlist_info = json.loads(response.text)
+    playlist = Playlist(playlist_info)
+    tracks = []
+    for track in playlist.tracks['items']:
+        # pdb.set_trace()
+        tracks.append(add_audio_analysis(PlaylistTrack(track).track, access_token))
+    for track in tracks:
+        print(track.name, track.tempo, track.danceability)
+
+    return [(track.name, track.tempo, track.danceability) for track in tracks]
+
+
+def add_audio_analysis(track, access_token):
+    me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
+    response = requests.get(api_url_base.format(endpoint='audio-features/{id}'.format(id=track.id)),
+                            headers=me_headers)
+    audio_analysis_info = json.loads(response.text)
+    if 'danceability' in audio_analysis_info.keys():
+        track.danceability = audio_analysis_info['danceability']
+    if 'liveness' in audio_analysis_info.keys():
+        track.liveness = audio_analysis_info['liveness']
+    if 'energy' in audio_analysis_info.keys():
+        track.energy = audio_analysis_info['energy']
+    if 'tempo' in audio_analysis_info.keys():
+        track.tempo = audio_analysis_info['tempo']
+    return track
+
+
 
 app.register_blueprint(blueprint)
