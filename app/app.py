@@ -87,28 +87,34 @@ def get_playlists():
     for playlist in playlists:
         playlist_info_list.append(get_playlist(playlist.href, access_token))
     """
-    return str(get_playlist(playlists[0], access_token))
+    return render_template('playlists.html', playlists=playlists, token=access_token)
 
 
-def get_playlist(playlist, access_token):
+@blueprint.route('/get_playlist')
+def get_playlist():
+    href = request.args.get('href')
+    access_token = request.args.get('token')
+
     me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
-    response = requests.get(playlist.href, headers=me_headers, json=True)
+    response = requests.get(href, headers=me_headers, json=True)
+
     playlist_info = json.loads(response.text)
     playlist = Playlist(playlist_info)
+
     tracks = []
     for track in playlist.tracks['items']:
-        # pdb.set_trace()
         tracks.append(add_audio_analysis(PlaylistTrack(track).track, access_token))
     for track in tracks:
         print(track.name, track.tempo, track.danceability)
 
-    return [(track.name, track.tempo, track.danceability) for track in tracks]
+    return render_template('playlist_tracks.html', tracks=tracks, token=access_token, playlist=playlist)
 
 
 def add_audio_analysis(track, access_token):
     me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
     response = requests.get(api_url_base.format(endpoint='audio-features/{id}'.format(id=track.id)),
                             headers=me_headers)
+
     audio_analysis_info = json.loads(response.text)
     if 'danceability' in audio_analysis_info.keys():
         track.danceability = audio_analysis_info['danceability']
@@ -118,8 +124,25 @@ def add_audio_analysis(track, access_token):
         track.energy = audio_analysis_info['energy']
     if 'tempo' in audio_analysis_info.keys():
         track.tempo = audio_analysis_info['tempo']
+
     return track
 
+
+@blueprint.route('/sort_playlist')
+def sort_playlist():
+    tracks = request.args.get('tracks')
+    token = request.args.get('token')
+    href = request.args.get('href')
+    href += '/tracks'
+
+
+    for track in tracks:
+        print track
+    tracks.sort(key=lambda track:track.danceability, reverse=True)
+    for track in tracks:
+        print(track.name)
+
+    return tracks
 
 
 app.register_blueprint(blueprint)
