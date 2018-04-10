@@ -1,5 +1,5 @@
-from models.track import Track
-from models.user import User
+from server.models.track import Track
+from server.models.user import User
 
 
 class PlaylistTrack():
@@ -19,3 +19,13 @@ class PlaylistTrack():
         if self.track:
             return self.track.name
         return None
+
+    def to_log(self):
+        dict = {
+            'name': self.track.name,
+            'artist': self.track.artist,
+            'danceability': self.track.danceability,
+            'liveness': self.track.liveness,
+            'tempo': self.track.tempo
+        }
+        return dict

@@ -57,6 +57,13 @@ def get_tracks(req: Dict[str, Any]):
     for track in playlist.tracks['items']:
         tracks.append(_add_audio_analysis(PlaylistTrack(track).track, token))
 
+    return_dict = {
+        'tracks': [track.to_log() for track in tracks],
+        'count': len(tracks)
+    }
+
+    return return_dict
+
 
 def _add_audio_analysis(track, token):
     me_headers = {'Authorization': 'Bearer {}'.format(token)}
