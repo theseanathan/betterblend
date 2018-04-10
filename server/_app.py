@@ -20,6 +20,7 @@ refresh_token = None
 
 @blueprint.route('/get_playlists', methods=['GET'])
 def get_playlists(req: Dict[str, Any]):
+    # TODO: FIX when persistent queue for tracks
     get_playlist_endpoint = 'me/playlists'
     access_token = req.get('token')
     # TODO: DECODE ACCESS TOKEN
