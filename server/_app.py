@@ -4,8 +4,8 @@ import requests
 from typing import Dict, Any
 import urllib.parse as urllib
 
-from server.models.playlist import Playlist
-from server.models.playlist_track import PlaylistTrack
+from models.playlist import Playlist
+from models.playlist_track import PlaylistTrack
 
 
 app = Flask(__name__)

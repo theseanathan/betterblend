@@ -1,5 +1,5 @@
-from server.models.track import Track
-from server.models.user import User
+from models.track import Track
+from models.user import User
 
 
 class PlaylistTrack():
