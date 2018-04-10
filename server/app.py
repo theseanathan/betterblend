@@ -8,7 +8,7 @@ import base64
 import random
 import requests
 import string
-import urllib
+import urllib.parse as urllib
 import json
 
 import pdb
@@ -45,8 +45,10 @@ def callback():
     url = 'https://accounts.spotify.com/api/token'
     code = request.args.get('code')
     state = request.args.get('state')
+    client = '{}:{}'.format(client_info.CLIENT_ID, client_info.CLIENT_SECRET).encode()
     if state is not None:
-        b64_client = base64.b64encode('{}:{}'.format(client_info.CLIENT_ID, client_info.CLIENT_SECRET))
+        b64_client = base64.b64encode(client).decode('ascii')
+        print(b64_client)
         token_header = {
             'Authorization': 'Basic {}'.format(b64_client)
         }
@@ -55,7 +57,7 @@ def callback():
             'redirect_uri': redirect_uri,
             'grant_type': 'authorization_code',
         }
-        response = requests.post(url, data=auth_dict, headers=token_header, json=True)
+        response = requests.post(url, data=auth_dict, headers=token_header)
         response_content = json.loads(response.content)
         access_token = response_content.get('access_token')
         refresh_token = response_content.get('refresh_token')
@@ -63,7 +65,7 @@ def callback():
         if response.status_code == 200:
             return home(access_token)
         else:
-            raise Exception(response)
+            raise Exception(response.text)
 
 
 def home(token):
@@ -75,9 +77,7 @@ def get_playlists():
     get_playlist_endpoint = 'me/playlists'
     access_token = request.args.get('token')
     me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
-    response = requests.get(api_url_base.format(endpoint=get_playlist_endpoint),
-                            headers=me_headers,
-                            json=True)
+    response = requests.get(api_url_base.format(endpoint=get_playlist_endpoint), headers=me_headers)
     playlists_data = json.loads(response.text)
     playlists = []
     for playlist in playlists_data['items']:
@@ -96,7 +96,7 @@ def get_playlist():
     access_token = request.args.get('token')
 
     me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
-    response = requests.get(href, headers=me_headers, json=True)
+    response = requests.get(href, headers=me_headers)
 
     playlist_info = json.loads(response.text)
     playlist = Playlist(playlist_info)
@@ -137,7 +137,7 @@ def sort_playlist():
 
 
     for track in tracks:
-        print track
+        print(track)
     tracks.sort(key=lambda track:track.danceability, reverse=True)
     for track in tracks:
         print(track.name)

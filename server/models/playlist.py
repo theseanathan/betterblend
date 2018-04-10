@@ -8,3 +8,10 @@ class Playlist():
         self.owner = User(kwargs['owner'])
         self.tracks = kwargs['tracks']
         self.uri = kwargs['uri']
+
+    def to_log(self):
+        dict = {
+            'name': self.name,
+            'id': self.id,
+            'href': self.href
+        }
