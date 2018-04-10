@@ -5,6 +5,7 @@ from typing import Dict, Any
 import urllib.parse as urllib
 
 from server.models.playlist import Playlist
+from server.models.playlist_track import PlaylistTrack
 
 
 app = Flask(__name__)
@@ -28,6 +29,7 @@ def get_playlists(req: Dict[str, Any]):
                             headers=me_headers)
 
     playlists_data = json.loads(response.text)
+
     playlists = []
     for playlist in playlists_data['items']:
         playlists.append(Playlist(playlist))
@@ -42,7 +44,36 @@ def get_playlists(req: Dict[str, Any]):
 
 @blueprint.route('/get_tracks', methods=['GET'])
 def get_tracks(req: Dict[str, Any]):
-    pass
+    href = req.get('href')
+    token = req.get('token')
+
+    me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
+    response = requests.get(href, headers=me_headers)
+
+    playlist_data = json.loads(response.text)
+    playlist = Playlist(playlist_data)
+
+    tracks = []
+    for track in playlist.tracks['items']:
+        tracks.append(_add_audio_analysis(PlaylistTrack(track).track, token))
+
+
+def _add_audio_analysis(track, token):
+    me_headers = {'Authorization': 'Bearer {}'.format(token)}
+    audio_analysis_endpoint = 'audio-features/{id}'.format(id=track.id)
+    response = requests.get(spotify_api_url_base.format(endpoint=audio_analysis_endpoint, headers=me_headers))
+
+    audio_analysis_info = json.loads(response.text)
+    if 'danceability' in audio_analysis_info.keys():
+        track.danceability = audio_analysis_info['danceability']
+    if 'liveness' in audio_analysis_info.keys():
+        track.liveness = audio_analysis_info['liveness']
+    if 'energy' in audio_analysis_info.keys():
+        track.energy = audio_analysis_info['energy']
+    if 'tempo' in audio_analysis_info.keys():
+        track.tempo = audio_analysis_info['tempo']
+
+    return track
 
 
 @blueprint.route('/vote_track', methods=['POST'])
