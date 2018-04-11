@@ -1,0 +1,50 @@
+{
+	"response":{
+		"playlist-1": {
+			"tracks": [
+				{
+					"id":0,
+					"vote":0,
+					"name":"hello",
+					"artist":"bo"
+				},
+				{
+					"id":1,
+					"vote":0,
+					"name":"good bye",
+					"artist":"sen"
+				},
+				{
+					"id":2,
+					"vote":0,
+					"name":"troll af",
+					"artist":"ori"
+				}
+			],
+			"count":3
+		},
+		"playlist-2": {
+			"tracks": [
+				{
+					"id":0,
+					"vote":0,
+					"name":"hello",
+					"artist":"bo"
+				},
+				{
+					"id":1,
+					"vote":0,
+					"name":"good bye",
+					"artist":"sen"
+				},
+				{
+					"id":2,
+					"vote":0,
+					"name":"troll af",
+					"artist":"ori"
+				}
+			],
+			"count":3
+		}
+	}
+}
