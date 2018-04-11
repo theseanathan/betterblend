@@ -63,5 +63,6 @@ client_info.pyc
 .idea
 venv
 .DS_Store
+*.pyc
 
 __pycache__
