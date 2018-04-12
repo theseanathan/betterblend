@@ -58,6 +58,8 @@ typings/
 .env
 
 client_info.*
+client_info.py
+client_info.json
 
 .idea
 venv
