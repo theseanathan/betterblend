@@ -57,8 +57,7 @@ typings/
 # dotenv environment variables file
 .env
 
-client_info.py
-client_info.pyc
+client_info.*
 
 .idea
 venv
