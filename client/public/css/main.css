@@ -6,6 +6,9 @@
 	box-sizing: border-box;
 }
 
+.alpha {font-family: 'Arvo', Serif;}
+.beta {font-family: 'Lato', Sans-Serif;}
+
 .container {
 	max-width: 960px;
 	margin: 0 auto;
@@ -23,9 +26,45 @@
 
 a {
 	text-decoration: none;
-	color:red;
+	color: red;
 }
 
 thead, tbody {
-	line-height: 40px;
+	line-height: 45px;
 }
+
+.vote {
+	margin:0 10px;
+	color:#A8A8A8;
+	cursor: pointer;
+}
+
+.vote:hover {
+	color:black;
+}
+
+th {
+	border-bottom: 1px solid #E1E1E1;
+}
+
+th:last-child,
+td:last-child {
+    text-align: right;
+}
+
+/* Mobile first queries */
+
+/* Larger than mobile */
+@media (min-width: 400px) {}
+
+/* Larger than phablet */
+@media (min-width: 550px) {}
+
+/* Larger than tablet */
+@media (min-width: 750px) {}
+
+/* Larger than desktop */
+@media (min-width: 1000px) {}
+
+/* Larger than Desktop HD */
+@media (min-width: 1200px) {}
