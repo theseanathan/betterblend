@@ -16,7 +16,8 @@ app.use(express.static('public'));
 app.set('view engine', 'hbs');
 
 
-app.get('/', (req, res) => {
+// 
+app.get('/login', (req, res) => {
     var scope = 'user-read-private user-read-email';
     var url = 'https://accounts.spotify.com/authorize?';
 
@@ -54,7 +55,9 @@ app.get('/callback', (req, res) => {
         if (!error && response.statusCode == 200) {
             console.log('access_token: ' + body.access_token);
             console.log('refresh_token: ' + body.refresh_token);
-            // TODO: Save tokens to HTML5 Web Storage, route to HOME page.
+
+            res.send({'access_token': body.access_token, 'refresh_token': body.refresh_token});
+            // res.end(body.access_token);
         } else {
             console.log("RESPONSE: " + JSON.stringify(response))
             console.log("BODY: " + JSON.stringify(body))
