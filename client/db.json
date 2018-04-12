@@ -1,50 +1,28 @@
 {
-	"response":{
-		"playlist-1": {
-			"tracks": [
-				{
-					"id":0,
-					"vote":0,
-					"name":"hello",
-					"artist":"bo"
-				},
-				{
-					"id":1,
-					"vote":0,
-					"name":"good bye",
-					"artist":"sen"
-				},
-				{
-					"id":2,
-					"vote":0,
-					"name":"troll af",
-					"artist":"ori"
-				}
-			],
-			"count":3
-		},
-		"playlist-2": {
-			"tracks": [
-				{
-					"id":0,
-					"vote":0,
-					"name":"hello",
-					"artist":"bo"
-				},
-				{
-					"id":1,
-					"vote":0,
-					"name":"good bye",
-					"artist":"sen"
-				},
-				{
-					"id":2,
-					"vote":0,
-					"name":"troll af",
-					"artist":"ori"
-				}
-			],
-			"count":3
-		}
+	"response": 
+	{
+		"playlists": [
+			{
+				"name":"hello there",
+				"id": 0,
+				"href":"url to this playlist"
+			},
+			{
+				"name":"testing name",
+				"id": 1,
+				"href":"url to this playlist"
+			},
+			{
+				"name":"goodbye world",
+				"id": 2,
+				"href":"url to this playlist"
+			},
+			{
+				"name":"hello world",
+				"id": 3,
+				"href":"url to this playlist"
+			}
+		],
+		"count":4
 	}
 }

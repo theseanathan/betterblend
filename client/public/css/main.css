@@ -15,3 +15,17 @@
 	font-family: 'Arvo', Serif;
 	font-size:40px;
 }
+
+.subtitle {
+	font-family: 'Lato', Sans-Serif;
+	font-size: 16px;
+}
+
+a {
+	text-decoration: none;
+	color:red;
+}
+
+thead, tbody {
+	line-height: 40px;
+}
