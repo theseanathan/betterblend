@@ -1,8 +1,15 @@
-from flask import Flask, Blueprint, request, redirect, render_template
+from flask import (
+    Blueprint,
+    Flask,
+    jsonify,
+    make_response,
+    request,
+)
+from functools import update_wrapper
+from typing import Dict, Any
+from datetime import timedelta
 import json
 import requests
-from typing import Dict, Any
-import urllib.parse as urllib
 
 from models.playlist import Playlist
 from models.playlist_track import PlaylistTrack
@@ -11,19 +18,71 @@ from models.playlist_track import PlaylistTrack
 app = Flask(__name__)
 blueprint = Blueprint('spotify_api', __name__)
 
-redirect_uri = 'http://localhost:5000/callback'
 spotify_api_url_base = 'https://api.spotify.com/v1/{endpoint}'
 
 access_token = None
 refresh_token = None
 
 
-@blueprint.route('/get_playlists', methods=['GET'])
-def get_playlists(req: Dict[str, Any]):
-    # TODO: FIX when persistent queue for tracks
+def crossdomain(origin=None, methods=None, headers=None, max_age=21600,
+                attach_to_all=True, automatic_options=True):
+    """Decorator function that allows crossdomain requests.
+      Courtesy of
+      https://blog.skyred.fi/articles/better-crossdomain-snippet-for-flask.html
+    """
+    if methods is not None:
+        methods = ', '.join(sorted(x.upper() for x in methods))
+    if headers is not None and not isinstance(headers, str):
+        headers = ', '.join(x.upper() for x in headers)
+    if not isinstance(origin, str):
+        origin = ', '.join(origin)
+    if isinstance(max_age, timedelta):
+        max_age = max_age.total_seconds()
+
+    def get_methods():
+        """ Determines which methods are allowed
+        """
+        if methods is not None:
+            return methods
+
+        options_resp = app.make_default_options_response()
+        return options_resp.headers['allow']
+
+    def decorator(f):
+        """The decorator function
+        """
+        def wrapped_function(*args, **kwargs):
+            """Caries out the actual cross domain code
+            """
+            if automatic_options and request.method == 'OPTIONS':
+                resp = app.make_default_options_response()
+            else:
+                resp = make_response(f(*args, **kwargs))
+            if not attach_to_all and request.method != 'OPTIONS':
+                return resp
+
+            h = resp.headers
+            h['Access-Control-Allow-Origin'] = origin
+            h['Access-Control-Allow-Methods'] = get_methods()
+            h['Access-Control-Max-Age'] = str(max_age)
+            h['Access-Control-Allow-Credentials'] = 'true'
+            h['Access-Control-Allow-Headers'] = \
+                "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+            if headers is not None:
+                h['Access-Control-Allow-Headers'] = headers
+            return resp
+
+        f.provide_automatic_options = False
+        return update_wrapper(wrapped_function, f)
+    return decorator
+
+
+@blueprint.route('/get_playlists', methods=['GET', 'POST', 'OPTIONS'])
+@crossdomain(origin='*')
+def get_playlists(req: Dict[str, Any] = None):
+# def get_playlists():
     get_playlist_endpoint = 'me/playlists'
-    access_token = req.get('token')
-    # TODO: DECODE ACCESS TOKEN
+    access_token = request.args.get('access_token')
 
     me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
     response = requests.get(spotify_api_url_base.format(endpoint=get_playlist_endpoint),
@@ -40,13 +99,13 @@ def get_playlists(req: Dict[str, Any]):
         'count': len(playlists)
     }
 
-    return return_dict
+    return jsonify(return_dict)
 
 
 @blueprint.route('/get_tracks', methods=['GET'])
 def get_tracks(req: Dict[str, Any]):
     href = req.get('href')
-    token = req.get('token')
+    token = req.get('access_token')
 
     me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
     response = requests.get(href, headers=me_headers)
@@ -102,3 +161,6 @@ def add_to_playlist():
     :return:
     """
     pass
+
+
+app.register_blueprint(blueprint)

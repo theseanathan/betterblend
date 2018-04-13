@@ -15,3 +15,4 @@ class Playlist():
             'id': self.id,
             'href': self.href
         }
+        return dict
