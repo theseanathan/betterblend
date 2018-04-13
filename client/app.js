@@ -15,6 +15,9 @@ app.use(express.static('public'));
 
 app.set('view engine', 'hbs');
 
+app.get('/', (req, res) => {
+    res.render('login')    
+});
 
 app.get('/login', (req, res) => {
     var scope = 'user-read-private user-read-email';
