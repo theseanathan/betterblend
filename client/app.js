@@ -1,4 +1,4 @@
-//app.js 
+// app.js 
 const atob = require('atob')
 const bodyParser = require('body-parser');
 const btoa = require('btoa')
@@ -8,7 +8,7 @@ const querystring = require('querystring');
 const request = require('request')
 
 const app = express();
-const callback_uri = 'http://localhost:8080/callback';
+const callback_uri = 'http://localhost:8080/callback.html';
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static('public'));
@@ -33,7 +33,11 @@ app.get('/login', (req, res) => {
     res.redirect(url + querystring.stringify(auth_dict));
 });
 
-app.get('/callback', (req, res) => {
+app.get('/client_info', (req, res) => {
+    res.send(client_info);
+});
+
+app.get('/access_token', (req, res) => {
     var code = req.query.code;
     var url = 'https://accounts.spotify.com/api/token';
 
@@ -58,7 +62,11 @@ app.get('/callback', (req, res) => {
             console.log('access_token: ' + body.access_token);
             console.log('refresh_token: ' + body.refresh_token);
 
-            res.send({'access_token': body.access_token, 'refresh_token': body.refresh_token});
+            res.send({
+                'access_token': body.access_token, 
+                'refresh_token': body.refresh_token,
+                'expires_in': body.expires_in
+            });
             // res.end(body.access_token);
         } else {
             console.log("RESPONSE: " + JSON.stringify(response))
