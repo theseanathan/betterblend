@@ -24,6 +24,7 @@ class Track():
             'liveness': self.liveness,
             'tempo': self.tempo,
             'id': self.id,
-            'vote_count': self.vote_count
+            'vote_count': self.vote_count,
+            'voter_list': self.voter_list
         }
         return dict

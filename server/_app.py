@@ -11,8 +11,8 @@ from datetime import timedelta
 import json
 import requests
 
-from server.models.playlist import Playlist
-from server.models.playlist_track import PlaylistTrack
+from models.playlist import Playlist
+from models.playlist_track import PlaylistTrack
 
 
 app = Flask(__name__)
@@ -89,7 +89,7 @@ def get_playlists(req: Dict[str, Any] = None):
     access_token = request.args.get('access_token')
 
     get_playlist_endpoint = 'me/playlists'
-    url = spotify_api_url_base.format(get_playlists)
+    url = spotify_api_url_base.format(endpoint=get_playlist_endpoint)
 
     playlists_data = get_request(url, access_token)
 
