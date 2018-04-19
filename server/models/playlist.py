@@ -1,9 +1,9 @@
-from server.models.user import User
+from models.user import User
 from pymongo import MongoClient
 from typing import List
 
-from server.models.playlist_track import PlaylistTrack
-import server.settings as settings
+from models.playlist_track import PlaylistTrack
+import settings as settings
 
 
 class Playlist():

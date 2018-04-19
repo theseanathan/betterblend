@@ -11,8 +11,8 @@ from datetime import timedelta
 import json
 import requests
 
-from server.models.playlist import Playlist
-from server.models.playlist_track import PlaylistTrack
+from models.playlist import Playlist
+from models.playlist_track import PlaylistTrack
 
 
 app = Flask(__name__)

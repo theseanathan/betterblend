@@ -9,7 +9,6 @@ function getPlaylists() {
     // let urls = 'http://localhost:3000/response';
 	let urls = 'http://localhost:5000/get_playlists?access_token=' + localStorage.getItem('access_token');
 	req.open('GET', urls);
-
 	req.onreadystatechange = function() {
 		let t = document.querySelector('#playlist-list')
 		if(req.status >= 200 && req.status < 300) {
