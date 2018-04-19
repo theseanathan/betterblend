@@ -89,7 +89,7 @@ def get_playlists(req: Dict[str, Any] = None):
     access_token = request.args.get('access_token')
 
     get_playlist_endpoint = 'me/playlists'
-    url = spotify_api_url_base.format(get_playlists)
+    url = spotify_api_url_base.format(endpoint=get_playlist_endpoint)
 
     playlists_data = get_request(url, access_token)
 
