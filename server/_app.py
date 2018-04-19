@@ -11,8 +11,8 @@ from datetime import timedelta
 import json
 import requests
 
-from models.playlist import Playlist
-from models.playlist_track import PlaylistTrack
+from server.models.playlist import Playlist
+from server.models.playlist_track import PlaylistTrack
 
 
 app = Flask(__name__)
@@ -77,18 +77,21 @@ def crossdomain(origin=None, methods=None, headers=None, max_age=21600,
     return decorator
 
 
+def get_request(url: str, access_token: str):
+    header = {'Authorization': 'Bearer {}'.format(access_token)}
+    response = requests.get(url, headers=header)
+    return json.loads(response.text)
+
+
 @blueprint.route('/get_playlists', methods=['GET', 'POST', 'OPTIONS'])
 @crossdomain(origin='*')
 def get_playlists(req: Dict[str, Any] = None):
-# def get_playlists():
-    get_playlist_endpoint = 'me/playlists'
     access_token = request.args.get('access_token')
 
-    me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
-    response = requests.get(spotify_api_url_base.format(endpoint=get_playlist_endpoint),
-                            headers=me_headers)
+    get_playlist_endpoint = 'me/playlists'
+    url = spotify_api_url_base.format(get_playlists)
 
-    playlists_data = json.loads(response.text)
+    playlists_data = get_request(url, access_token)
 
     playlists = []
     for playlist in playlists_data['items']:
@@ -102,9 +105,12 @@ def get_playlists(req: Dict[str, Any] = None):
     return jsonify(return_dict)
 
 
-@blueprint.route('/get_tracks', methods=['GET'])
+@blueprint.route('/get_tracks', methods=['POST', 'OPTIONS'])
+@crossdomain(origin='*')
 def get_tracks(req: Dict[str, Any]):
     href = req.get('href')
+    id = req.get('id')
+    name = req.get('name')
     token = req.get('access_token')
 
     me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
@@ -117,12 +123,14 @@ def get_tracks(req: Dict[str, Any]):
     for track in playlist.tracks['items']:
         tracks.append(_add_audio_analysis(PlaylistTrack(track).track, token))
 
+    playlist.add_tracks(tracks)
+
     return_dict = {
         'tracks': [track.to_log() for track in tracks],
         'count': len(tracks)
     }
 
-    return return_dict
+    return jsonify(return_dict)
 
 
 def _add_audio_analysis(track, token):
