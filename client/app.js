@@ -79,4 +79,9 @@ app.get('/playlists', (req, res) => {
 	res.render('playlists');
 });
 
+app.get('/tracks', (req, res) => {
+    console.log(req.body);
+    res.render('playlist_tracks');
+});
+
 app.listen(8080);
