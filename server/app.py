@@ -1,75 +1,14 @@
-import client_info
 from models.playlist import Playlist
 from models.track import Track
 from models.playlist_track import PlaylistTrack
 
-from flask import Flask, Blueprint, request, redirect, render_template
-import base64
-import random
+from flask import Flask, request
 import requests
-import string
-import urllib.parse as urllib
 import json
 
 import pdb
 
 app = Flask(__name__)
-blueprint = Blueprint('spotify_api', __name__)
-
-api_url_base = 'https://api.spotify.com/v1/{endpoint}'
-redirect_uri = 'http://localhost:5000/callback'
-access_token = None
-refresh_token = None
-
-
-@blueprint.route('/login', methods=['GET'])
-def login():
-    url = 'https://accounts.spotify.com/authorize?'
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
-    scope = 'user-read-private user-read-email'
-    auth_dict = {
-        'client_id': client_info.CLIENT_ID,
-        'response_type': 'code',
-        'redirect_uri': redirect_uri,
-        'state': state,
-        'scope': scope,
-    }
-    # response = requests.get(url, params=auth_dict)
-    redirect_str = url + urllib.urlencode(auth_dict)
-    print("REDIRECTING TO: " + redirect_str)
-    return redirect(redirect_str)
-
-
-@blueprint.route('/callback', methods=['GET'])
-def callback():
-    url = 'https://accounts.spotify.com/api/token'
-    code = request.args.get('code')
-    state = request.args.get('state')
-    client = '{}:{}'.format(client_info.CLIENT_ID, client_info.CLIENT_SECRET).encode()
-    if state is not None:
-        b64_client = base64.b64encode(client).decode('ascii')
-        print(b64_client)
-        token_header = {
-            'Authorization': 'Basic {}'.format(b64_client)
-        }
-        auth_dict = {
-            'code': code.encode('ascii'),
-            'redirect_uri': redirect_uri,
-            'grant_type': 'authorization_code',
-        }
-        response = requests.post(url, data=auth_dict, headers=token_header)
-        response_content = json.loads(response.content)
-        access_token = response_content.get('access_token')
-        refresh_token = response_content.get('refresh_token')
-
-        if response.status_code == 200:
-            return home(access_token)
-        else:
-            raise Exception(response.text)
-
-
-def home(token):
-    return render_template('index.html', token=token)
 
 
 @blueprint.route('/get_playlists')

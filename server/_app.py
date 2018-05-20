@@ -8,6 +8,7 @@ from flask import (
 from functools import update_wrapper
 from typing import Dict, Any
 from datetime import timedelta
+from pymongo import collection
 import json
 import requests
 
