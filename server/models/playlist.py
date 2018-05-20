@@ -1,4 +1,5 @@
 from models.user import User
+from mongoengine import Document, StringField, EmbeddedDocumentField, ListField
 from pymongo import MongoClient
 from typing import List
 
@@ -6,8 +7,9 @@ from models.playlist_track import PlaylistTrack
 import settings as settings
 
 
-class Playlist():
-    def __init__(self, kwargs):
+class Playlist(Document):
+    def __init__(self, **kwargs):
+        super(Playlist, self).__init__(**kwargs)
         self.href = kwargs['href']
         self.id = kwargs['id']
         self.name = kwargs['name']
@@ -15,11 +17,14 @@ class Playlist():
         self.tracks = kwargs['tracks']
         self.uri = kwargs['uri']
 
-        self.mongo_client = MongoClient('localhost', 27017)
-        self.db = self.mongo_client[settings.DB]
-        if self.id not in self.db.collection_names():
-            self.db.create_collection(self.id)
-        self.collection = self.db[self.id]
+        self.meta['collection'] = 'playlist_{}'.format(self.id)
+
+    href = StringField()
+    id = StringField()
+    name = StringField()
+    owner = EmbeddedDocumentField(User)
+    tracks = ListField(EmbeddedDocumentField(PlaylistTrack))
+    uri = StringField()
 
     def to_log(self):
         dict = {

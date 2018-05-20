@@ -1,5 +1,9 @@
-class Track():
-    def __init__(self, kwargs):
+from mongoengine import EmbeddedDocument
+
+class Track(EmbeddedDocument):
+    def __init__(self, **kwargs):
+        super(Track, self).__init__(**kwargs)
+
         self.album = kwargs['album']['name']
         self.artist = kwargs['artists'][0]['name']
         self.danceability = None

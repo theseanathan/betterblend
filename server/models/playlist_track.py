@@ -1,9 +1,12 @@
+from mongoengine import EmbeddedDocument
+
 from models.track import Track
 from models.user import User
 
 
-class PlaylistTrack():
-    def __init__(self, kwargs):
+class PlaylistTrack(EmbeddedDocument):
+    def __init__(self, **kwargs):
+        super(PlaylistTrack, self).__init__(**kwargs)
         self.added_at = kwargs['added_at']
         self.added_by = User(kwargs['added_by'])
         self.track = Track(kwargs['track'])
