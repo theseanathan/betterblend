@@ -5,12 +5,13 @@ from flask import (
 )
 
 import base64
+import json
 import random
 import requests
 import string
 import urllib.parse as urllib
 
-import client_info
+from server import client_info
 
 blueprint = Blueprint('spotify_auth', __name__)
 

@@ -1,12 +1,12 @@
-from models.playlist import Playlist
-from models.track import Track
-from models.playlist_track import PlaylistTrack
-
-from flask import Flask, request
+from flask import Flask, request, Blueprint
 import requests
 import json
-
 import pdb
+
+from server.models.playlist import Playlist
+from server.models.track import Track
+from server.models.playlist_track import PlaylistTrack
+
 
 app = Flask(__name__)
 
