@@ -1,2 +1,3 @@
 DB = 'pp'
-PLAYLIST_COLLECTION = 'playlists'
+PLAYLIST_COLLECTION = 'playlist_{}'
+TOKENS_COLLECTION = 'tokens'
