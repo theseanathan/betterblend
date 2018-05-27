@@ -3,12 +3,16 @@ import requests
 import json
 import pdb
 
-from server.models.playlist import Playlist
-from server.models.track import Track
-from server.models.playlist_track import PlaylistTrack
+from models.playlist import Playlist
+from models.track import Track
+from models.playlist_track import PlaylistTrack
+from routes.spotify_auth import auth_blueprint
 
 
 app = Flask(__name__)
+blueprint = Blueprint('spotify', __name__)
+
+api_url_base = 'https://api.spotify.com/v1/{endpoint}'
 
 
 @blueprint.route('/get_playlists')
@@ -26,7 +30,6 @@ def get_playlists():
     for playlist in playlists:
         playlist_info_list.append(get_playlist(playlist.href, access_token))
     """
-    return render_template('playlists.html', playlists=playlists, token=access_token)
 
 
 @blueprint.route('/get_playlist')
@@ -45,8 +48,6 @@ def get_playlist():
         tracks.append(add_audio_analysis(PlaylistTrack(track).track, access_token))
     for track in tracks:
         print(track.name, track.tempo, track.danceability)
-
-    return render_template('playlist_tracks.html', tracks=tracks, token=access_token, playlist=playlist)
 
 
 def add_audio_analysis(track, access_token):
@@ -85,3 +86,4 @@ def sort_playlist():
 
 
 app.register_blueprint(blueprint)
+app.register_blueprint(auth_blueprint)

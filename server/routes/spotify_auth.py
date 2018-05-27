@@ -11,9 +11,11 @@ import requests
 import string
 import urllib.parse as urllib
 
-from server import client_info
+import client_info
+from models import tokens
+from models.tokens import Tokens
 
-blueprint = Blueprint('spotify_auth', __name__)
+auth_blueprint = Blueprint('spotify_auth', __name__)
 
 api_url_base = 'https://api.spotify.com/v1/{endpoint}'
 redirect_uri = 'http://localhost:5000/callback'
@@ -21,7 +23,7 @@ access_token = None
 refresh_token = None
 
 
-@blueprint.route('/authorize', methods=['GET'])
+@auth_blueprint.route('/authorize', methods=['GET'])
 def login():
     url = 'https://accounts.spotify.com/authorize?'
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
@@ -38,11 +40,19 @@ def login():
     return redirect(redirect_str)
 
 
-@blueprint.route('/callback', methods=['GET'])
+@auth_blueprint.route('/callback', methods=['GET'])
 def callback():
+    print("CALLBACK")
+    if not tokens.has_token():
+        code = request.args.get('code')
+        state = request.args.get('state')
+        return first_time_save_token(code, state)
+    else:
+        return update_token()
+
+
+def first_time_save_token(code, state):
     url = 'https://accounts.spotify.com/api/token'
-    code = request.args.get('code')
-    state = request.args.get('state')
     client = '{}:{}'.format(client_info.CLIENT_ID, client_info.CLIENT_SECRET).encode()
     if state is not None:
         b64_client = base64.b64encode(client).decode('ascii')
@@ -56,15 +66,37 @@ def callback():
         }
         response = requests.post(url, data=auth_dict, headers=token_header)
         response_content = json.loads(response.content)
-        access_token = response_content.get('access_token')
-        refresh_token = response_content.get('refresh_token')
-        expiration = response_content.get('expiration')
-
         if response.status_code == 200:
-            # return home(access_token)
-            _save_tokens(access_token, refresh_token, expiration)
+            token = Tokens(response_content)
+            token.save()
+            return token._to_log_param()
         else:
             raise Exception(response.text)
 
-def _save_tokens(access_token: str, refresh_token: str, expiration: str):
 
+def update_token():
+    if not tokens.is_token_valid():
+        print("UPDATE_TOKEN")
+        url = 'https://accounts.spotify.com/api/token'
+        data = {
+            'grant_type': 'refresh_token',
+            'refresh_token': tokens.get_refresh_token()
+        }
+        client = '{}:{}'.format(client_info.CLIENT_ID, client_info.CLIENT_SECRET).encode()
+        b64_client = base64.b64encode(client).decode('ascii')
+        token_header = {
+            'Authorization': 'Basic {}'.format(b64_client)
+        }
+        response = requests.post(url, data=data, headers=token_header)
+        print("AFTER API CALL")
+        response_content = json.loads(response.content)
+
+        token = tokens.get_token()
+        token.update(response_content)
+        print("AFTER UPDATE TOKEN")
+        token.save()
+
+        return str(token)
+    else:
+        token = tokens.get_token()
+        return str(token)
