@@ -5,11 +5,12 @@ from mongoengine import (
     Document,
     IntField,
     StringField,
+    ObjectIdField
 )
 from pymongo import MongoClient
 import json
 
-from server import settings
+import settings
 
 connect(settings.DB)
 client = MongoClient('localhost', 27017)
@@ -17,15 +18,19 @@ client = MongoClient('localhost', 27017)
 class Tokens(Document):
     def __init__(self, kwargs):
         super(Tokens, self).__init__(**kwargs)
-        self.access_token = kwargs['access_token']
-        self.refresh_token = kwargs['refresh_token']
-        self.scope = kwargs['scope']
-        self.token_type = kwargs['token_type']
+        try:
+            self.access_token = kwargs['access_token']
+            self.refresh_token = kwargs['refresh_token']
+            self.scope = kwargs['scope']
+            self.token_type = kwargs['token_type']
 
-        self.curr_time = datetime.now()
-        self.expires_in = kwargs['expires_in']
+            self.curr_time = datetime.now()
+            self.expires_in = kwargs['expires_in']
 
-        self.expiration = self.curr_time + timedelta(seconds=self.expires_in)
+            self.expiration = self.curr_time + timedelta(seconds=self.expires_in)
+            self._id = kwargs['_id']
+        except:
+            pass
 
     meta = {
         'collection': 'tokens',
@@ -37,9 +42,19 @@ class Tokens(Document):
     refresh_token = StringField()
     scope = StringField()
     token_type = StringField()
+    _id = ObjectIdField()
 
     def save(self, **kwargs):
         super(Tokens, self).save()
+
+    def update(self, kwargs):
+        try:
+            self.access_token = kwargs['access_token']
+            self.token_type = kwargs['token_type']
+            self.expires_in = kwargs['expires_in']
+            self.scope = kwargs['scope']
+        except:
+            pass
 
     def _to_log_param(self):
         return {
@@ -75,3 +90,11 @@ def get_access_token():
 def get_token_type():
     token = _get_token()
     return token['token_type']
+
+
+def get_token():
+    return Tokens(_get_token())
+
+
+def has_token():
+    return Tokens.objects.count() > 0
