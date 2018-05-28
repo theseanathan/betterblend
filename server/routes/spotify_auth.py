@@ -17,7 +17,6 @@ from models.tokens import Tokens
 
 auth_blueprint = Blueprint('spotify_auth', __name__)
 
-api_url_base = 'https://api.spotify.com/v1/{endpoint}'
 redirect_uri = 'http://localhost:5000/callback'
 access_token = None
 refresh_token = None
