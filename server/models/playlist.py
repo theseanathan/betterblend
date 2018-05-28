@@ -1,30 +1,18 @@
-from models.user import User
-from mongoengine import Document, StringField, EmbeddedDocumentField, ListField
-from pymongo import MongoClient
 from typing import List
+import requests
+import json
 
-from models.playlist_track import PlaylistTrack
+from models import tokens
+from models.track import Track
 import settings as settings
 
 
-class Playlist(Document):
+class Playlist:
     def __init__(self, **kwargs):
-        super(Playlist, self).__init__(**kwargs)
         self.href = kwargs['href']
         self.id = kwargs['id']
         self.name = kwargs['name']
-        self.owner = User(kwargs['owner'])
-        self.tracks = kwargs['tracks']
-        self.uri = kwargs['uri']
-
-        self.meta['collection'] = 'playlist_{}'.format(self.id)
-
-    href = StringField()
-    id = StringField()
-    name = StringField()
-    owner = EmbeddedDocumentField(User)
-    tracks = ListField(EmbeddedDocumentField(PlaylistTrack))
-    uri = StringField()
+        self.tracks = [item.track for item in kwargs['tracks']['items']]
 
     def to_log(self):
         dict = {
@@ -34,9 +22,14 @@ class Playlist(Document):
         }
         return dict
 
-    def add_tracks(self, tracks: List[PlaylistTrack]):
-        self.tracks = tracks
-
     def save(self):
         for track in self.tracks:
-            self.collection.insert_one(track.to_log())
+            href = track['href']
+            access_token = tokens.get_access_token()
+
+            me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
+            track_dict = requests.get(href, headers=me_headers)
+
+            track_object = json.loads(track_dict.text)
+            track = Track(track_object)
+            track.save()
