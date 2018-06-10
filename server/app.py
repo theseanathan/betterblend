@@ -1,42 +1,23 @@
-from flask import Flask, request, Blueprint
+from flask import request, Blueprint
 import requests
 import json
-import pdb
 
-from models.playlist import Playlist
-from models.track import Track
-from models.playlist_track import PlaylistTrack
-from routes.spotify_auth import auth_blueprint
+from server import settings
+from server.lib import spotify, tokens
+from server.models.playlist import Playlist
+from server.models.playlist_track import PlaylistTrack
+from server.routes.spotify_auth import auth_blueprint
 
-
-app = Flask(__name__)
-blueprint = Blueprint('spotify', __name__)
-
-api_url_base = 'https://api.spotify.com/v1/{endpoint}'
-
-
-@blueprint.route('/get_playlists')
-def get_playlists():
-    get_playlist_endpoint = 'me/playlists'
-    access_token = request.args.get('token')
-    me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
-    response = requests.get(api_url_base.format(endpoint=get_playlist_endpoint), headers=me_headers)
-    playlists_data = json.loads(response.text)
-    playlists = []
-    for playlist in playlists_data['items']:
-        playlists.append(Playlist(playlist))
-    playlist_info_list = []
-    """
-    for playlist in playlists:
-        playlist_info_list.append(get_playlist(playlist.href, access_token))
-    """
+blueprint = Blueprint('app', __name__)
 
 
 @blueprint.route('/get_playlist')
 def get_playlist():
-    href = request.args.get('href')
-    access_token = request.args.get('token')
+    id = requests.args.get('id')
+    href = requests.args.get('href')
+    access_token = tokens.get_access_token()
 
+    # TODO: Return playlist collection from Mongo with updated songs
     me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
     response = requests.get(href, headers=me_headers)
 
@@ -83,7 +64,3 @@ def sort_playlist():
         print(track.name)
 
     return tracks
-
-
-app.register_blueprint(blueprint)
-app.register_blueprint(auth_blueprint)

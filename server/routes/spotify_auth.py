@@ -11,9 +11,9 @@ import requests
 import string
 import urllib.parse as urllib
 
-import client_info
-from models import tokens
-from models.tokens import Tokens
+import server.client_info
+from server.lib import tokens
+from server.models.tokens import Tokens
 
 auth_blueprint = Blueprint('spotify_auth', __name__)
 
