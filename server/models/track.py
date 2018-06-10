@@ -1,14 +1,32 @@
-from mongoengine import Document, StringField, IntField, ListField, MapField
+from mongoengine import (
+    connect,
+    Document,
+    EmbeddedDocument,
+    EmbeddedDocumentField,
+    IntField,
+    ListField,
+    MapField,
+    ObjectIdField,
+    StringField,
+)
 import json
 import requests
 
-import settings
-from models import tokens
+from server import settings
+from server.lib import tokens
+
+connect(settings.DB)
+
+
+class TrackAttribute(EmbeddedDocument):
+    attribute = StringField()
+    value = IntField()
 
 
 class Track(Document):
     def __init__(self, **kwargs):
         super(Track, self).__init__(**kwargs)
+        self.meta = {}
 
         try:
             self.album = kwargs['album']['name']
@@ -18,6 +36,9 @@ class Track(Document):
             self.name = kwargs['name']
             self.vote_count = 0
             self.voter_list = []
+
+            # TODO: Figure out how to handle tracks w/ playlist id
+            self.playlist_id = None
         except Exception as e:
             print("Track object creation failed: ", e)
 
@@ -25,16 +46,17 @@ class Track(Document):
         self.track_attributes['liveness'] = None
         self.track_attributes['tempo'] = None
 
-        self.meta['collection'] = 'playlist_{}'.format(self.id)
+        self.meta['collection'] = 'playlist_{}'.format(self.playlist_id)
 
     album = StringField()
     artist = StringField()
     href = StringField()
-    id = StringField()
+    id = ObjectIdField()
+    playlist_id = StringField()
     name = StringField()
     vote_count = IntField()
     voter_list = ListField(StringField())
-    track_attributes = MapField(StringField())
+    track_attributes = MapField(field=StringField())
 
     def to_log(self):
         dict = {

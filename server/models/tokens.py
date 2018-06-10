@@ -7,13 +7,12 @@ from mongoengine import (
     StringField,
     ObjectIdField
 )
-from pymongo import MongoClient
 import json
 
-import settings
+from server import settings
 
 connect(settings.DB)
-client = MongoClient('localhost', 27017)
+
 
 class Tokens(Document):
     def __init__(self, kwargs):
@@ -65,36 +64,3 @@ class Tokens(Document):
 
     def __str__(self):
         return json.dumps(self._to_log_param())
-
-
-def _get_token():
-    tokens_collection = client[settings.DB][settings.TOKENS_COLLECTION]
-    return tokens_collection.find_one()
-
-
-def is_token_valid():
-    token = _get_token()
-    return datetime.now() < token['expiration']
-
-
-def get_refresh_token():
-    token = _get_token()
-    return token['refresh_token']
-
-
-def get_access_token():
-    token = _get_token()
-    return token['access_token']
-
-
-def get_token_type():
-    token = _get_token()
-    return token['token_type']
-
-
-def get_token():
-    return Tokens(_get_token())
-
-
-def has_token():
-    return Tokens.objects.count() > 0

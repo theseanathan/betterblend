@@ -1,7 +1,7 @@
 from mongoengine import EmbeddedDocument
 
-from models.track import Track
-from models.user import User
+from server.models.track import Track
+from server.models.user import User
 
 
 class PlaylistTrack(EmbeddedDocument):

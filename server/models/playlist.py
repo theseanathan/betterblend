@@ -1,26 +1,41 @@
-from typing import List
 import requests
 import json
 
-from models import tokens
-from models.track import Track
-import settings as settings
+from server.lib import spotify
+from server.lib import tokens
+from server.models.track import Track
 
 
 class Playlist:
-    def __init__(self, **kwargs):
-        self.href = kwargs['href']
-        self.id = kwargs['id']
-        self.name = kwargs['name']
-        self.tracks = [item.track for item in kwargs['tracks']['items']]
+    def __init__(self, kwargs):
+        try:
+            self.href = kwargs['href']
+            self.id = kwargs['id']
+            self.name = kwargs['name']
+            self.image = kwargs['images']
+            self.tracks = None
+
+            for img in self.image:
+                if img['height'] == 60:
+                    self.image = img
+        except Exception as e:
+            print("No item attribute, ", e)
 
     def to_log(self):
         dict = {
-            'name': self.name,
+            'href': self.href,
             'id': self.id,
-            'href': self.href
+            'image': self.image,
+            'name': self.name,
         }
         return dict
+
+    def __str__(self):
+        return str(self.to_log())
+
+    def get_tracks(self):
+        playlist_info = spotify.get(self.href)
+        self.tracks = playlist_info['tracks']['items']
 
     def save(self):
         for track in self.tracks:
