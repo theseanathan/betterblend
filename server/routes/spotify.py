@@ -1,12 +1,10 @@
-from flask import (
-    Blueprint,
-    redirect,
-    request
-)
+from flask import Blueprint
+import requests
 
-from server.models.playlist import Playlist
-from server.lib import spotify
 from server import settings
+from server.lib import spotify, tokens
+from server.lib.spotify import _get_tracks
+from server.models.playlist import Playlist
 
 spotify_blueprint = Blueprint('spotify', __name__)
 
@@ -49,7 +47,13 @@ class Spotify:
 
         :return: List of track object jsons
         """
-        pass
+        id = requests.args.get('id')
+        href = requests.args.get('href')
+
+        try:
+            return _get_tracks(id, href)
+        except:
+            pass
 
     @spotify_blueprint.route('/vote_track', methods=['PUT'])
     def vote_track(self):

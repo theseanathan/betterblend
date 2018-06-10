@@ -1,16 +1,12 @@
 from datetime import datetime
-from pymongo import MongoClient
 
+from server import settings
+from server.lib import client, tokens_collection
 from server.models.tokens import Tokens
 from server.routes import spotify_auth
-from server import settings
-
-
-client = MongoClient('localhost', 27017)
 
 
 def _get_token():
-    tokens_collection = client[settings.DB][settings.TOKENS_COLLECTION]
     return tokens_collection.find_one()
 
 

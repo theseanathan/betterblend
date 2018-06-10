@@ -11,7 +11,7 @@ import requests
 import string
 import urllib.parse as urllib
 
-import server.client_info
+from server import client_info
 from server.lib import tokens
 from server.models.tokens import Tokens
 

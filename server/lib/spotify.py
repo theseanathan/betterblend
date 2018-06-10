@@ -1,7 +1,9 @@
 import requests
 import json
 
-from server.lib import tokens
+from server.lib import tokens, mongo_db
+
+PLAYLIST_NAME = 'playlist_{}'
 
 
 class SpotifyCallException(Exception):
@@ -19,4 +21,16 @@ def get(href: str):
     else:
         return json.loads(response.text)
 
+
+def _get_tracks(id, href):
+    access_token = tokens.get_access_token()
+    playlist_name = PLAYLIST_NAME.format(id)
+    playlist_in_db = playlist_name in mongo_db.list_collection_names()
+
+    if playlist_in_db:
+        # TODO: Call spotify and match tracks to collection
+        pass
+    else:
+        # TODO: Create Playlist track by creating list of Track objects and saving
+        pass
 
