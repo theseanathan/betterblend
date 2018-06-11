@@ -7,7 +7,7 @@ function main() {
 function getPlaylists() {
 	let req = new XMLHttpRequest();
     //let urls = 'http://localhost:3000/response';
-	let urls = 'http://localhost:5000/get_playlists?access_token=' + localStorage.getItem('access_token');
+	let urls = 'http://localhost:5000/get_playlists';
 	req.open('GET', urls);
 	//req.onreadystatechange = function() {
 	req.addEventListener('load', function(evt) {
