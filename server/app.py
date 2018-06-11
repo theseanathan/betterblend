@@ -1,12 +1,4 @@
 from flask import request, Blueprint
-import requests
-import json
-
-from server import settings
-from server.lib import spotify, tokens
-from server.models.playlist import Playlist
-from server.models.playlist_track import PlaylistTrack
-from server.routes.spotify_auth import auth_blueprint
 
 blueprint = Blueprint('app', __name__)
 
