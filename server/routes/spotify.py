@@ -1,12 +1,12 @@
-from flask import (
-    Blueprint,
-    redirect,
-    request
-)
+from flask import Blueprint, request, jsonify
+from webargs.flaskparser import use_args
+import requests
 
-from server.models.playlist import Playlist
-from server.lib import spotify
 from server import settings
+from server.lib import tokens
+from server.lib import spotify
+from server.models.playlist import Playlist
+from server.schemas.spotify import GetPlaylistSchema
 
 spotify_blueprint = Blueprint('spotify', __name__)
 
@@ -38,18 +38,23 @@ class Spotify:
             playlist.get_tracks()
             playlists.append(str(playlist))
 
-        return str(playlists)
+        return jsonify(playlists)
 
     @spotify_blueprint.route('/get_playlist', methods=['GET'])
+    @use_args(GetPlaylistSchema, locations=['querystring'])
     def get_playlist(req):
         """
-        Use schema OR use requests.args.get to get ID and href of playlist to get.
-        If playlist exists, get and compare with spotify playlist.
-        If not, create playlist and populate with tracks from spotify.
+        Use schema get ID and href of playlist to get.
 
         :return: List of track object jsons
         """
-        pass
+        id = req.get('id')
+        href = req.get('href')
+
+        try:
+            return jsonify(spotify.get_tracks(id, href))
+        except:
+            pass
 
     @spotify_blueprint.route('/vote_track', methods=['PUT'])
     def vote_track(self):

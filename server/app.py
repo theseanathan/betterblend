@@ -1,52 +1,6 @@
 from flask import request, Blueprint
-import requests
-import json
-
-from server import settings
-from server.lib import spotify, tokens
-from server.models.playlist import Playlist
-from server.models.playlist_track import PlaylistTrack
-from server.routes.spotify_auth import auth_blueprint
 
 blueprint = Blueprint('app', __name__)
-
-
-@blueprint.route('/get_playlist')
-def get_playlist():
-    id = requests.args.get('id')
-    href = requests.args.get('href')
-    access_token = tokens.get_access_token()
-
-    # TODO: Return playlist collection from Mongo with updated songs
-    me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
-    response = requests.get(href, headers=me_headers)
-
-    playlist_info = json.loads(response.text)
-    playlist = Playlist(playlist_info)
-
-    tracks = []
-    for track in playlist.tracks['items']:
-        tracks.append(add_audio_analysis(PlaylistTrack(track).track, access_token))
-    for track in tracks:
-        print(track.name, track.tempo, track.danceability)
-
-
-def add_audio_analysis(track, access_token):
-    me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
-    response = requests.get(api_url_base.format(endpoint='audio-features/{id}'.format(id=track.id)),
-                            headers=me_headers)
-
-    audio_analysis_info = json.loads(response.text)
-    if 'danceability' in audio_analysis_info.keys():
-        track.danceability = audio_analysis_info['danceability']
-    if 'liveness' in audio_analysis_info.keys():
-        track.liveness = audio_analysis_info['liveness']
-    if 'energy' in audio_analysis_info.keys():
-        track.energy = audio_analysis_info['energy']
-    if 'tempo' in audio_analysis_info.keys():
-        track.tempo = audio_analysis_info['tempo']
-
-    return track
 
 
 @blueprint.route('/sort_playlist')
