@@ -2,13 +2,16 @@ from mongoengine import (
     connect,
     Document,
     EmbeddedDocument,
-    EmbeddedDocumentField,
+    FloatField,
     IntField,
     ListField,
     MapField,
     ObjectIdField,
     StringField,
+    DictField,
+    BooleanField,
 )
+from bson.objectid import ObjectId
 import json
 import requests
 
@@ -17,61 +20,76 @@ from server.lib import tokens
 
 connect(settings.DB)
 
-
-class TrackAttribute(EmbeddedDocument):
-    attribute = StringField()
-    value = IntField()
+class TrackException(Exception):
+    pass
 
 
 class Track(Document):
-    def __init__(self, **kwargs):
+    meta = {'collection': 'tracks'}
+
+    def __init__(self, kwargs, playlist_id: str = None):
         super(Track, self).__init__(**kwargs)
-        self.meta = {}
 
         try:
+            self.id = ObjectId()
             self.album = kwargs['album']['name']
             self.artist = kwargs['artists'][0]['name']
             self.href = kwargs['href']
-            self.id = kwargs['id']
             self.name = kwargs['name']
-            self.vote_count = 0
+            self.track_id = kwargs['id']
             self.voter_list = []
+            self.vote_count = 0
 
-            # TODO: Figure out how to handle tracks w/ playlist id
-            self.playlist_id = None
+            self.playlist_id = playlist_id if playlist_id else kwargs['playlist_id']
         except Exception as e:
             print("Track object creation failed: ", e)
 
-        self.track_attributes['danceability'] = None
-        self.track_attributes['liveness'] = None
-        self.track_attributes['tempo'] = None
 
-        self.meta['collection'] = 'playlist_{}'.format(self.playlist_id)
-
+    id = ObjectIdField(primary_key=True, unique=True)
     album = StringField()
     artist = StringField()
     href = StringField()
-    id = ObjectIdField()
-    playlist_id = StringField()
     name = StringField()
-    vote_count = IntField()
+    playlist_id = StringField()
+    track_attributes = MapField(field=FloatField())
+    track_id = StringField()
     voter_list = ListField(StringField())
-    track_attributes = MapField(field=StringField())
+    vote_count = IntField()
+
+    artists = ListField()
+    available_markets = ListField(StringField())
+    disc_number = IntField()
+    duration_ms = IntField()
+    episode = BooleanField()
+    explicit = BooleanField()
+    external_fields = DictField()
+    external_ids = DictField()
+    external_urls = DictField()
+    is_local = BooleanField()
+    popularity = FloatField()
+    preview_url = StringField()
+    track = BooleanField()
+    track_number = IntField()
+    type = StringField()
+    uri = StringField()
 
     def to_log(self):
         dict = {
-            'name': self.name,
             'artist': self.artist,
             'danceability': self.track_attributes['danceability'],
             'liveness': self.track_attributes['liveness'],
+            'name': self.name,
+            'playlist_id': self.playlist_id,
             'tempo': self.track_attributes['tempo'],
-            'id': self.id,
+            'track_id': self.track_id,
+            'voter_list': self.voter_list,
             'vote_count': self.vote_count,
-            'voter_list': self.voter_list
         }
         return dict
 
     def pre_save(self):
+        if self.playlist_id is None:
+            raise TrackException('Every track needs to have a playlist_id')
         self._add_audio_analysis()
 
     def save(self, **kwargs):
@@ -80,10 +98,11 @@ class Track(Document):
 
     def _add_audio_analysis(self):
         me_headers = {'Authorization': 'Bearer {}'.format(tokens.get_access_token())}
-        response = requests.get(settings.API_URL_BASE.format(endpoint='audio-features/{id}'.format(id=self.id)),
+        response = requests.get(settings.API_URL_BASE.format(endpoint='audio-features/{id}'.format(id=self.track_id)),
                                 headers=me_headers)
 
         audio_analysis_info = json.loads(response.text)
+
         if 'danceability' in audio_analysis_info.keys():
             self.track_attributes['danceability'] = audio_analysis_info['danceability']
         if 'liveness' in audio_analysis_info.keys():

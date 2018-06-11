@@ -4,7 +4,7 @@ from server.models.track import Track
 from server.models.user import User
 
 
-class PlaylistTrack(EmbeddedDocument):
+class PlaylistTrack:
     def __init__(self, **kwargs):
         super(PlaylistTrack, self).__init__(**kwargs)
         self.added_at = kwargs['added_at']

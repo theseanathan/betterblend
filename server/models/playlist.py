@@ -13,7 +13,7 @@ class Playlist:
             self.id = kwargs['id']
             self.name = kwargs['name']
             self.image = kwargs['images']
-            self.tracks = None
+            self.tracks = kwargs['tracks']
 
             for img in self.image:
                 if img['height'] == 60:
