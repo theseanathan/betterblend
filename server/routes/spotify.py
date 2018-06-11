@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, request, jsonify
 import requests
 
 from server import settings
@@ -36,10 +36,10 @@ class Spotify:
             playlist.get_tracks()
             playlists.append(str(playlist))
 
-        return str(playlists)
+        return jsonify(playlists)
 
     @spotify_blueprint.route('/get_playlist', methods=['GET'])
-    def get_playlist(req):
+    def get_playlist():
         """
         Use schema OR use requests.args.get to get ID and href of playlist to get.
         If playlist exists, get and compare with spotify playlist.
@@ -47,11 +47,13 @@ class Spotify:
 
         :return: List of track object jsons
         """
-        id = requests.args.get('id')
-        href = requests.args.get('href')
+        id = request.args.get('id')
+        href = request.args.get('href')
+
+        print('id: ', id, 'href', href)
 
         try:
-            return spotify.get_tracks(id, href)
+            return jsonify(spotify.get_tracks(id, href))
         except:
             pass
 

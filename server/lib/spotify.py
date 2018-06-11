@@ -43,7 +43,6 @@ def get_tracks(id, href):
     spotify_tracks = _get_tracks_from_spotify(href, id)
     db_tracks = list(tracks_collection.find({'playlist_id': id}))
     db_track_ids = [db_track['track_id'] for db_track in db_tracks]
-    import pdb
 
     for track in spotify_tracks:
         if track.track_id not in db_track_ids:
@@ -51,13 +50,11 @@ def get_tracks(id, href):
 
     db_tracks = list(tracks_collection.find({'playlist_id': id}))
 
-    pdb.set_trace()
-
     for db_track in db_tracks:
         id = db_track['_id']
         del db_track['_id']
         db_track['id'] = id
 
-    tracks = [Track(db_track) for db_track in db_tracks]
+    tracks = [Track(db_track).to_log() for db_track in db_tracks]
 
     return tracks

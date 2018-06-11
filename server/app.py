@@ -11,6 +11,7 @@ from server.routes.spotify_auth import auth_blueprint
 blueprint = Blueprint('app', __name__)
 
 
+"""
 @blueprint.route('/get_playlist')
 def get_playlist():
     id = requests.args.get('id')
@@ -29,6 +30,7 @@ def get_playlist():
         tracks.append(add_audio_analysis(PlaylistTrack(track).track, access_token))
     for track in tracks:
         print(track.name, track.tempo, track.danceability)
+"""
 
 
 def add_audio_analysis(track, access_token):
