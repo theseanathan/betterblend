@@ -24,7 +24,7 @@ class TrackAttribute(EmbeddedDocument):
 
 
 class Track(Document):
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(Track, self).__init__(**kwargs)
         self.meta = {}
 
