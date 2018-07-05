@@ -1,17 +1,17 @@
-from flask import request, Blueprint
+from flask import request, Blueprint, Flask
 import requests
 import json
 
-from server import settings
-from server.lib import spotify, tokens
+from server.lib import tokens
 from server.models.playlist import Playlist
 from server.models.playlist_track import PlaylistTrack
+from server.routes.spotify import spotify_blueprint
 from server.routes.spotify_auth import auth_blueprint
 
+app = Flask(__name__)
 blueprint = Blueprint('app', __name__)
 
 
-@blueprint.route('/get_playlist')
 def get_playlist():
     id = requests.args.get('id')
     href = requests.args.get('href')
@@ -64,3 +64,7 @@ def sort_playlist():
         print(track.name)
 
     return tracks
+
+app.register_blueprint(blueprint)
+app.register_blueprint(spotify_blueprint)
+app.register_blueprint(auth_blueprint)

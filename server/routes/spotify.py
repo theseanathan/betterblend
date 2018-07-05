@@ -3,9 +3,11 @@ from flask import (
     redirect,
     request
 )
+from webargs.flaskparser import use_args
 
 from server.models.playlist import Playlist
 from server.lib import spotify
+from server.schemas.spotify_schema import SpotifyGetPlaylistSchema
 from server import settings
 
 spotify_blueprint = Blueprint('spotify', __name__)
@@ -41,6 +43,7 @@ class Spotify:
         return str(playlists)
 
     @spotify_blueprint.route('/get_playlist', methods=['GET'])
+    @use_args(SpotifyGetPlaylistSchema, locations=['querystring'])
     def get_playlist(req):
         """
         Use schema OR use requests.args.get to get ID and href of playlist to get.
@@ -49,7 +52,14 @@ class Spotify:
 
         :return: List of track object jsons
         """
-        pass
+        if 'href' in req:
+            response = spotify.get(req['href'])
+        else:
+            get_playlist_endpoint = 'users/theseanathan/playlists/{id}/tracks'.format(id=req['id'])
+            response = spotify.get(settings.API_URL_BASE.format(endpoint=get_playlist_endpoint))
+        tracks = response['items']['tracks']
+
+        return str(response['items'])
 
     @spotify_blueprint.route('/vote_track', methods=['PUT'])
     def vote_track(self):

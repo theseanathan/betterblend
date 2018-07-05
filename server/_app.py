@@ -1,6 +1,5 @@
 from flask import (
     Blueprint,
-    Flask,
     jsonify,
     make_response,
     request,
@@ -16,13 +15,9 @@ from models.playlist import Playlist
 from models.playlist_track import PlaylistTrack
 
 
-app = Flask(__name__)
 blueprint = Blueprint('spotify_api', __name__)
 
 spotify_api_url_base = 'https://api.spotify.com/v1/{endpoint}'
-
-access_token = None
-refresh_token = None
 
 
 def crossdomain(origin=None, methods=None, headers=None, max_age=21600,

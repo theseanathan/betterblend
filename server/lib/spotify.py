@@ -18,5 +18,3 @@ def get(href: str):
         raise SpotifyCallException('Spotify request failed with the status code: {}'.format(response.status_code))
     else:
         return json.loads(response.text)
-
-

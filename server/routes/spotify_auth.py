@@ -11,7 +11,7 @@ import requests
 import string
 import urllib.parse as urllib
 
-import server.client_info
+from server import client_info
 from server.lib import tokens
 from server.models.tokens import Tokens
 
@@ -22,8 +22,7 @@ access_token = None
 refresh_token = None
 
 
-@auth_blueprint.route('/authorize', methods=['GET'])
-def login():
+def get_access_token():
     url = 'https://accounts.spotify.com/authorize?'
     state = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
     scope = 'user-read-private user-read-email'

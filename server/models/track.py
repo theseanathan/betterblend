@@ -26,7 +26,7 @@ class TrackAttribute(EmbeddedDocument):
 class Track(Document):
     def __init__(self, *args, **kwargs):
         super(Track, self).__init__(**kwargs)
-        self.meta = {}
+        self.meta = {'collection': 'tracks'}
 
         try:
             self.album = kwargs['album']['name']
@@ -37,7 +37,6 @@ class Track(Document):
             self.vote_count = 0
             self.voter_list = []
 
-            # TODO: Figure out how to handle tracks w/ playlist id
             self.playlist_id = None
         except Exception as e:
             print("Track object creation failed: ", e)
@@ -45,8 +44,6 @@ class Track(Document):
         self.track_attributes['danceability'] = None
         self.track_attributes['liveness'] = None
         self.track_attributes['tempo'] = None
-
-        self.meta['collection'] = 'playlist_{}'.format(self.playlist_id)
 
     album = StringField()
     artist = StringField()
