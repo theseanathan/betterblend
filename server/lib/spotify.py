@@ -25,8 +25,9 @@ def get(href: str):
     else:
         return json.loads(response.text)
 
-def _get_tracks_from_spotify(href, playlist_id):
-    response = requests.get(href, headers=headers)
+def _get_tracks_from_spotify(playlist_id):
+    url = settings.API_GET_PLAYLIST.format(id=playlist_id)
+    response = requests.get(url, headers=headers)
 
     playlist_info = json.loads(response.text)
     playlist = Playlist(playlist_info)
@@ -34,19 +35,21 @@ def _get_tracks_from_spotify(href, playlist_id):
     tracks = []
 
     for track in playlist.tracks['items']:
-        track_model = Track(track['track'], playlist_id=playlist_id)
+        track_model = Track(track['track'])
+        track_model.playlist_id = playlist_id
         tracks.append(track_model)
 
     return tracks
 
-def get_tracks(id, href):
-    spotify_tracks = _get_tracks_from_spotify(href, id)
+def get_tracks(id):
+    spotify_tracks = _get_tracks_from_spotify(id)
     db_tracks = list(tracks_collection.find({'playlist_id': id}))
     db_track_ids = [db_track['track_id'] for db_track in db_tracks]
 
     for track in spotify_tracks:
         if track.track_id not in db_track_ids:
             track.save()
+
 
     db_tracks = list(tracks_collection.find({'playlist_id': id}))
 

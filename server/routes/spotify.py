@@ -49,12 +49,11 @@ class Spotify:
         :return: List of track object jsons
         """
         id = req.get('id')
-        href = req.get('href')
 
         try:
-            return jsonify(spotify.get_tracks(id, href))
-        except:
-            pass
+            return jsonify(spotify.get_tracks(id))
+        except Exception as e:
+            return str(e)
 
     @spotify_blueprint.route('/vote_track', methods=['PUT'])
     def vote_track(self):

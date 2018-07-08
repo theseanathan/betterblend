@@ -61,6 +61,8 @@ client_info.*
 client_info.py
 client_info.json
 
+*.pyc
+
 .idea
 venv
 .DS_Store

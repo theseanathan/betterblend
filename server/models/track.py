@@ -27,7 +27,7 @@ class TrackException(Exception):
 class Track(Document):
     meta = {'collection': 'tracks'}
 
-    def __init__(self, kwargs, playlist_id: str = None):
+    def __init__(self, *args, **kwargs):
         super(Track, self).__init__(**kwargs)
 
         try:
@@ -45,7 +45,7 @@ class Track(Document):
             print("Track object creation failed: ", e)
 
 
-    id = ObjectIdField(primary_key=True, unique=True)
+    id = ObjectIdField(primary_key=True)
     album = StringField()
     artist = StringField()
     href = StringField()
