@@ -1,3 +1,4 @@
+from flask import make_response
 import requests
 import json
 
@@ -15,6 +16,7 @@ class SpotifyCallException(Exception):
 
 headers = {'Authorization': 'Bearer {}'.format(tokens.get_access_token())}
 
+
 def get(href: str):
     access_token = tokens.get_access_token()
 
@@ -24,6 +26,7 @@ def get(href: str):
         raise SpotifyCallException('Spotify request failed with the status code: {}'.format(response.status_code))
     else:
         return json.loads(response.text)
+
 
 def _get_tracks_from_spotify(playlist_id):
     url = settings.API_GET_PLAYLIST.format(id=playlist_id)
@@ -35,29 +38,36 @@ def _get_tracks_from_spotify(playlist_id):
     tracks = []
 
     for track in playlist.tracks['items']:
-        track_model = Track(track['track'])
-        track_model.playlist_id = playlist_id
+        track['track']['playlist_id'] = playlist_id
+        track['track']['album'] = track['track']['album']['name']
+        track_model = Track(**track['track'])
         tracks.append(track_model)
 
     return tracks
 
+
 def get_tracks(id):
     spotify_tracks = _get_tracks_from_spotify(id)
-    db_tracks = list(tracks_collection.find({'playlist_id': id}))
-    db_track_ids = [db_track['track_id'] for db_track in db_tracks]
+    _add_tracks_to_mongo(spotify_tracks, id)
 
-    for track in spotify_tracks:
-        if track.track_id not in db_track_ids:
-            track.save()
-
-
-    db_tracks = list(tracks_collection.find({'playlist_id': id}))
-
-    for db_track in db_tracks:
-        id = db_track['_id']
-        del db_track['_id']
-        db_track['id'] = id
-
-    tracks = [Track(db_track).to_log() for db_track in db_tracks]
+    tracks = [track.to_log() for track in Track.objects(playlist_id=id)]
 
     return tracks
+
+
+def _add_tracks_to_mongo(tracks, playlist_id):
+    db_tracks = Track.objects(playlist_id=playlist_id)
+
+    for track in tracks:
+        if track not in db_tracks:
+            try:
+                track.save()
+            except Exception as e:
+                print(str(e))
+
+
+def vote_track(track_id, playlist_id, vote):
+    track = Track.objects.get(track_id=id, playlist_id=playlist_id)
+    track.vote_count = track.vote_count + vote
+    track.save()
+    return make_response('Vote successful!', 200)
