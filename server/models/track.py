@@ -50,9 +50,9 @@ class Track(Document):
     artist = StringField()
     href = StringField()
     name = StringField()
-    playlist_id = StringField()
+    playlist_id = StringField(required=True)
     track_attributes = MapField(field=FloatField())
-    track_id = StringField()
+    track_id = StringField(required=True)
     voter_list = ListField(StringField())
     vote_count = IntField()
 
