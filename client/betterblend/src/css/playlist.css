@@ -1,0 +1,91 @@
+.playlist-div {
+	transition: transform .15s;
+	box-sizing: border-box;
+}
+
+.playlist-div:hover {
+	transform: translateX(15px);
+}
+
+.left-style {
+	border-left: 1px solid turquoise;
+	padding-left: 1rem;
+	height: 60px;
+	margin-bottom: 5px;
+	display: inline-block;
+	float:left;
+}
+
+.playlist-link {
+	color:black;
+	text-decoration: none;
+	display: table;
+}
+
+.playlist-title {
+	font-size: 15px;
+	margin-left: 1rem;
+}
+
+.track-container {
+	display: table;
+	max-height:60px;
+	width:100%;
+	margin-bottom:1.5rem;
+	border-bottom:1px solid lightgray;
+}
+
+.song-title {
+	font-size: 15px;
+	border-left: 1px solid turquoise;
+	margin-left: 1rem;
+	padding-left: 1rem;
+	margin-bottom: -2px;
+}
+
+.track-data {
+	display: inline-block;
+	float:left;
+	margin-bottom: 0;
+}
+
+.song-data {
+	display: inline-block;
+	float:right;
+	padding-top: 1.2%;
+}
+
+.count-num {
+	padding-bottom:0;
+	margin-bottom: 0;
+	height:100%;
+}
+
+.artist {
+	margin-left:2rem;
+	margin-bottom:0;
+	font-size: 13px;
+}
+
+.song-data > div {
+	display: inline-block;
+	margin-right:2rem;
+}
+
+.vote-buttons {
+	cursor: pointer;
+	-webkit-transition: all 90ms ease-in;
+	-ms-transition: all 90ms ease-in; 
+	-moz-transition: all 90ms ease-in;
+	transition: all 90ms ease-in;
+}
+.vote-buttons:hover {
+	-webkit-transform: scale(1.2);
+	-ms-transform: scale(1.2);   
+	-moz-transform: scale(1.2);
+	transform: scale(1.2);
+}
+
+.vote-buttons > a {
+	color:black;
+}

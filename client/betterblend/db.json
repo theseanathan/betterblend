@@ -1,0 +1,16 @@
+{
+	"api": {
+		"playlists": [
+			{"img":"http://via.placeholder.com/60x60", "name": "title", "id":0},
+			{"img":"http://via.placeholder.com/60x60", "name": "title", "id":1},
+			{"img":"http://via.placeholder.com/60x60", "name": "title", "id":2},
+			{"img":"http://via.placeholder.com/60x60", "name": "title", "id":3}
+		],
+		"tracks": [
+			{"img":"http://via.placeholder.com/60x60", "name":"song-title", "artist": "artist", "count": 69, "id":0},
+			{"img":"http://via.placeholder.com/60x60", "name":"song-title", "artist": "artist", "count": 69, "id":1},
+			{"img":"http://via.placeholder.com/60x60", "name":"song-title", "artist": "artist", "count": 69, "id":2},
+			{"img":"http://via.placeholder.com/60x60", "name":"song-title", "artist": "artist", "count": 69, "id":3}
+		]
+	}
+}
