@@ -1,7 +1,6 @@
 from mongoengine import (
     connect,
     Document,
-    EmbeddedDocument,
     FloatField,
     IntField,
     ListField,
@@ -20,6 +19,7 @@ from server.lib import tokens
 
 connect(settings.DB)
 
+
 class TrackException(Exception):
     pass
 
@@ -32,7 +32,7 @@ class Track(Document):
 
         try:
             self.id = ObjectId()
-            self.album = kwargs['album']['name']
+            self.album = kwargs['album']
             self.artist = kwargs['artists'][0]['name']
             self.href = kwargs['href']
             self.name = kwargs['name']
@@ -40,7 +40,7 @@ class Track(Document):
             self.voter_list = []
             self.vote_count = 0
 
-            self.playlist_id = playlist_id if playlist_id else kwargs['playlist_id']
+            self.playlist_id = kwargs['playlist_id']
         except Exception as e:
             print("Track object creation failed: ", e)
 
@@ -50,9 +50,9 @@ class Track(Document):
     artist = StringField()
     href = StringField()
     name = StringField()
-    playlist_id = StringField()
+    playlist_id = StringField(required=True)
     track_attributes = MapField(field=FloatField())
-    track_id = StringField()
+    track_id = StringField(required=True)
     voter_list = ListField(StringField())
     vote_count = IntField()
 
@@ -81,7 +81,7 @@ class Track(Document):
             'name': self.name,
             'playlist_id': self.playlist_id,
             'tempo': self.track_attributes['tempo'],
-            'track_id': self.track_id,
+            'track_id': str(self.track_id),
             'voter_list': self.voter_list,
             'vote_count': self.vote_count,
         }

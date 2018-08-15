@@ -1,12 +1,10 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint,  jsonify, make_response
 from webargs.flaskparser import use_args
-import requests
 
 from server import settings
-from server.lib import tokens
 from server.lib import spotify
 from server.models.playlist import Playlist
-from server.schemas.spotify import GetPlaylistSchema
+from server.schemas.spotify import GetPlaylistSchema, PutPlaylistSchema
 
 spotify_blueprint = Blueprint('spotify', __name__)
 
@@ -56,8 +54,20 @@ class Spotify:
             return str(e)
 
     @spotify_blueprint.route('/vote_track', methods=['PUT'])
-    def vote_track(self):
-        pass
+    @use_args(PutPlaylistSchema, locations=['querystring', 'json'])
+    def vote_track(req):
+        """
+        Vote up/down track
+
+        :return: Vote track response
+        """
+        id = req.get('id')
+        vote = req.get('vote')
+
+        try:
+            return spotify.vote_track(id, vote)
+        except Exception as e:
+            return str(e)
 
     @spotify_blueprint.route('/add_track', methods=['POST'])
     def add_track(self):
