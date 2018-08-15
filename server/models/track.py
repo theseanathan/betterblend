@@ -116,7 +116,7 @@ class Track(Document):
             self.track_attributes['tempo'] = audio_analysis_info['tempo']
 
     def track_exists(self):
-        tracks = Track.objects(track_id=self.track_id)
+        tracks = Track.objects(track_id=self.track_id, playlist_id=self.playlist_id)
         if tracks:
             return True
         return False
