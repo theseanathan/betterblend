@@ -47,9 +47,7 @@ def _get_tracks_from_spotify(playlist_id):
 
     tracks = []
 
-    import pdb
     for track in playlist.tracks['items']:
-        pdb.set_trace()
         track['track']['playlist_id'] = playlist_id
         track['track']['album'] = track['track']['album']['name']
 
