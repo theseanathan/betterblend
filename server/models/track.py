@@ -36,7 +36,11 @@ class Track(Document):
             self.artist = kwargs['artists'][0]['name']
             self.href = kwargs['href']
             self.name = kwargs['name']
-            self.track_id = kwargs['id']
+            if 'track_id' in kwargs:
+                self.id = kwargs['id']
+                self.track_id = kwargs['track_id']
+            else:
+                self.track_id = kwargs['id']
             self.voter_list = []
             self.vote_count = 0
 
