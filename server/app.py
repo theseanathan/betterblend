@@ -1,100 +1,23 @@
-import client_info
-from models.playlist import Playlist
-from models.track import Track
-from models.playlist_track import PlaylistTrack
-
-from flask import Flask, Blueprint, request, redirect, render_template
-import base64
-import random
+from flask import request, Blueprint, Flask
 import requests
-import string
-import urllib.parse as urllib
 import json
 
-import pdb
+from server.lib import tokens
+from server.models.playlist import Playlist
+from server.models.playlist_track import PlaylistTrack
+from server.routes.spotify import spotify_blueprint
+from server.routes.spotify_auth import auth_blueprint
 
 app = Flask(__name__)
-blueprint = Blueprint('spotify_api', __name__)
-
-api_url_base = 'https://api.spotify.com/v1/{endpoint}'
-redirect_uri = 'http://localhost:5000/callback'
-access_token = None
-refresh_token = None
+blueprint = Blueprint('app', __name__)
 
 
-@blueprint.route('/login', methods=['GET'])
-def login():
-    url = 'https://accounts.spotify.com/authorize?'
-    state = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
-    scope = 'user-read-private user-read-email'
-    auth_dict = {
-        'client_id': client_info.CLIENT_ID,
-        'response_type': 'code',
-        'redirect_uri': redirect_uri,
-        'state': state,
-        'scope': scope,
-    }
-    # response = requests.get(url, params=auth_dict)
-    redirect_str = url + urllib.urlencode(auth_dict)
-    print("REDIRECTING TO: " + redirect_str)
-    return redirect(redirect_str)
-
-
-@blueprint.route('/callback', methods=['GET'])
-def callback():
-    url = 'https://accounts.spotify.com/api/token'
-    code = request.args.get('code')
-    state = request.args.get('state')
-    client = '{}:{}'.format(client_info.CLIENT_ID, client_info.CLIENT_SECRET).encode()
-    if state is not None:
-        b64_client = base64.b64encode(client).decode('ascii')
-        print(b64_client)
-        token_header = {
-            'Authorization': 'Basic {}'.format(b64_client)
-        }
-        auth_dict = {
-            'code': code.encode('ascii'),
-            'redirect_uri': redirect_uri,
-            'grant_type': 'authorization_code',
-        }
-        response = requests.post(url, data=auth_dict, headers=token_header)
-        response_content = json.loads(response.content)
-        access_token = response_content.get('access_token')
-        refresh_token = response_content.get('refresh_token')
-
-        if response.status_code == 200:
-            return home(access_token)
-        else:
-            raise Exception(response.text)
-
-
-def home(token):
-    return render_template('index.html', token=token)
-
-
-@blueprint.route('/get_playlists')
-def get_playlists():
-    get_playlist_endpoint = 'me/playlists'
-    access_token = request.args.get('token')
-    me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
-    response = requests.get(api_url_base.format(endpoint=get_playlist_endpoint), headers=me_headers)
-    playlists_data = json.loads(response.text)
-    playlists = []
-    for playlist in playlists_data['items']:
-        playlists.append(Playlist(playlist))
-    playlist_info_list = []
-    """
-    for playlist in playlists:
-        playlist_info_list.append(get_playlist(playlist.href, access_token))
-    """
-    return render_template('playlists.html', playlists=playlists, token=access_token)
-
-
-@blueprint.route('/get_playlist')
 def get_playlist():
-    href = request.args.get('href')
-    access_token = request.args.get('token')
+    id = requests.args.get('id')
+    href = requests.args.get('href')
+    access_token = tokens.get_access_token()
 
+    # TODO: Return playlist collection from Mongo with updated songs
     me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
     response = requests.get(href, headers=me_headers)
 
@@ -106,8 +29,6 @@ def get_playlist():
         tracks.append(add_audio_analysis(PlaylistTrack(track).track, access_token))
     for track in tracks:
         print(track.name, track.tempo, track.danceability)
-
-    return render_template('playlist_tracks.html', tracks=tracks, token=access_token, playlist=playlist)
 
 
 def add_audio_analysis(track, access_token):
@@ -144,5 +65,6 @@ def sort_playlist():
 
     return tracks
 
-
 app.register_blueprint(blueprint)
+app.register_blueprint(spotify_blueprint)
+app.register_blueprint(auth_blueprint)
