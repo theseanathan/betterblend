@@ -94,7 +94,8 @@ class Track(Document):
 
     def save(self, **kwargs):
         self.pre_save()
-        super(Track, self).save()
+        if not self.track_exists():
+            super(Track, self).save()
 
     def _add_audio_analysis(self):
         me_headers = {'Authorization': 'Bearer {}'.format(tokens.get_access_token())}
@@ -109,3 +110,9 @@ class Track(Document):
             self.track_attributes['liveness'] = audio_analysis_info['liveness']
         if 'tempo' in audio_analysis_info.keys():
             self.track_attributes['tempo'] = audio_analysis_info['tempo']
+
+    def track_exists(self):
+        tracks = Track.objects(track_id=self.track_id)
+        if tracks:
+            return True
+        return False

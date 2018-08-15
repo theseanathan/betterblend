@@ -18,5 +18,26 @@ class GetPlaylistSchema(Schema):
     playlists = fields.List(fields.Nested(PlaylistSchema))
 
 
-class PutPlaylistSchema(GetPlaylistSchema):
+class PutTrackInputSchema(GetPlaylistSchema):
     vote = fields.Int(required=True)
+    id = fields.Str(required=True)
+
+
+class GetTracksInputSchema(Schema):
+    id = fields.Str(required=True)
+
+
+class TrackSchema(Schema):
+    artist = fields.Str()
+    danceability = fields.Float()
+    liveness = fields.Float()
+    name = fields.Str()
+    playlist_id = fields.Str()
+    tempo = fields.Float()
+    track_id = fields.Str()
+    voter_list = fields.List(fields.Str())
+    vote_count = fields.Int()
+
+
+class GetTracksResponseSchema(Schema):
+    tracks = fields.List(fields.Nested(TrackSchema))
