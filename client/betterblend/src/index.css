@@ -1,0 +1,29 @@
+body {
+	margin: 0;
+	padding: 0;
+	font-family: sans-serif;
+}
+
+header {
+	padding:2rem 0;
+}
+
+.links {
+	color: gray;
+	text-decoration: none;
+	border:.5px solid gray;
+	border-radius: 4px;
+	padding:10px 25px;
+	font-weight: 100;
+}
+
+.links:hover {
+	color: black;
+	border: .5px solid black;
+}
+
+.my-container {
+	max-width:960px;
+	margin:0 auto;
+	padding:1.5rem;
+}
