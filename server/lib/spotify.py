@@ -5,7 +5,7 @@ import requests
 import sys
 
 from server import settings
-from server.lib import tokens, tracks_collection
+from server.lib import tokens
 from server.models.playlist import Playlist
 from server.models.track import Track
 
@@ -61,7 +61,7 @@ def get_tracks(id):
     spotify_tracks = _get_tracks_from_spotify(id)
     _add_tracks_to_mongo(spotify_tracks, id)
 
-    tracks = [track.to_log() for track in Track.objects(playlist_id=id)]
+    tracks = Track.objects(playlist_id=id)
 
     return tracks
 

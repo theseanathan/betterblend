@@ -36,7 +36,11 @@ class Track(Document):
             self.artist = kwargs['artists'][0]['name']
             self.href = kwargs['href']
             self.name = kwargs['name']
-            self.track_id = kwargs['id']
+            if 'track_id' in kwargs:
+                self.id = kwargs['id']
+                self.track_id = kwargs['track_id']
+            else:
+                self.track_id = kwargs['id']
             self.voter_list = []
             self.vote_count = 0
 
@@ -94,7 +98,8 @@ class Track(Document):
 
     def save(self, **kwargs):
         self.pre_save()
-        super(Track, self).save()
+        if not self.track_exists():
+            super(Track, self).save()
 
     def _add_audio_analysis(self):
         me_headers = {'Authorization': 'Bearer {}'.format(tokens.get_access_token())}
@@ -109,3 +114,9 @@ class Track(Document):
             self.track_attributes['liveness'] = audio_analysis_info['liveness']
         if 'tempo' in audio_analysis_info.keys():
             self.track_attributes['tempo'] = audio_analysis_info['tempo']
+
+    def track_exists(self):
+        tracks = Track.objects(track_id=self.track_id, playlist_id=self.playlist_id)
+        if tracks:
+            return True
+        return False

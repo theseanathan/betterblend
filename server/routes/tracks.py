@@ -2,7 +2,12 @@ from flask import Blueprint, jsonify
 from webargs.flaskparser import use_args
 
 from server.lib import spotify
-from server.schemas.spotify import GetPlaylistSchema, PutPlaylistSchema
+from server.schemas.spotify import (
+    GetTracksInputSchema,
+    GetTracksResponseSchema,
+    PutTrackInputSchema,
+    TrackSchema
+)
 
 
 tracks_blueprint = Blueprint('tracks', __name__)
@@ -10,7 +15,7 @@ tracks_blueprint = Blueprint('tracks', __name__)
 
 class Tracks:
     @tracks_blueprint.route('/get_playlist', methods=['GET'])
-    @use_args(GetPlaylistSchema, locations=['querystring'])
+    @use_args(GetTracksInputSchema, locations=['querystring'])
     def get_playlist(req):
         """
         Use schema get ID and href of playlist to get.
@@ -20,12 +25,23 @@ class Tracks:
         id = req.get('id')
 
         try:
-            return jsonify(spotify.get_tracks(id))
+            tracks = spotify.get_tracks(id)
+            track_schema = TrackSchema()
+            tracks_schema = GetTracksResponseSchema()
+            tracks_obj = {'tracks': []}
+
+            for track in tracks:
+                track_data, error = track_schema.dump(track)
+                tracks_obj['tracks'].append(track_data)
+
+            tracks_response, error = tracks_schema.dump(tracks_obj)
+
+            return jsonify(tracks_response)
         except Exception as e:
             return str(e)
 
     @tracks_blueprint.route('/vote_track', methods=['PUT'])
-    @use_args(PutPlaylistSchema, locations=['querystring', 'json'])
+    @use_args(PutTrackInputSchema, locations=['querystring', 'json'])
     def vote_track(req):
         """
         Vote up/down track
