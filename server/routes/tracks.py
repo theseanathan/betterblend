@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, make_response
 from webargs.flaskparser import use_args
 
 from server.lib import spotify
@@ -35,7 +35,6 @@ class Tracks:
                 tracks_obj['tracks'].append(track_data)
 
             tracks_response, error = tracks_schema.dump(tracks_obj)
-
             return jsonify(tracks_response)
         except Exception as e:
             return str(e)
@@ -45,6 +44,8 @@ class Tracks:
     def vote_track(req):
         """
         Vote up/down track
+        id = mongo object id [str]
+        vote = up/down vote [int]
 
         :return: Vote track response
         """
@@ -54,7 +55,7 @@ class Tracks:
         try:
             return spotify.vote_track(id, vote)
         except Exception as e:
-            return str(e)
+            return make_response(str(e), 500)
 
     @tracks_blueprint.route('/add_track', methods=['POST'])
     def add_track(self):
