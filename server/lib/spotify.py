@@ -73,20 +73,15 @@ def _add_tracks_to_mongo(tracks, playlist_id):
     for track in tracks:
         if track not in db_tracks:
             try:
-                track.save()
+                track.new_save()
             except Exception as e:
                 log.info("Exception thrown when saving track", exception=e)
 
 
-def _get_track(track_id, playlist_id):
+def _get_track(mongo_id):
     try:
-        tracks = Track.objects(playlist_id=playlist_id)
-        tracks = [track for track in tracks if track.track_id == track_id]
-        if len(tracks) <= 0:
-            raise Track.DoesNotExist("track: {track}, playlist: {playlist}".format(track=track_id,
-                                                                                   playlist=playlist_id))
-        else:
-            return tracks[0]
+        track = Track.objects.get(id=mongo_id)
+        return track
     except Track.DoesNotExist as e:
         log.info('Track does not exist.')
     except Exception as e:
@@ -94,8 +89,11 @@ def _get_track(track_id, playlist_id):
 
 
 
-def vote_track(track_id, playlist_id, vote):
-    track = _get_track(track_id, playlist_id)
-    track.vote_count = track.vote_count + vote
-    track.save()
-    return make_response('Vote successful!', 200)
+# TODO: Add a unique user account to add to voters_list for track s.t. people can't vote twice
+def vote_track(mongo_id, vote):
+    try:
+        track = _get_track(mongo_id)
+        track.vote_count += vote
+        track.save()
+    except:
+        raise

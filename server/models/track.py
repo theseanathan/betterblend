@@ -31,20 +31,17 @@ class Track(Document):
         super(Track, self).__init__(**kwargs)
 
         try:
-            self.id = ObjectId()
             self.album = kwargs['album']
             self.artist = kwargs['artists'][0]['name']
             self.href = kwargs['href']
             self.name = kwargs['name']
-            if 'track_id' in kwargs:
-                self.id = kwargs['id']
-                self.track_id = kwargs['track_id']
-            else:
-                self.track_id = kwargs['id']
-            self.voter_list = []
-            self.vote_count = 0
-
             self.playlist_id = kwargs['playlist_id']
+
+            self.id = kwargs['id'] if 'track_id' in kwargs else ObjectId()
+            self.track_id = kwargs['track_id'] if 'track_id' in kwargs else kwargs['id']
+            self.voter_list = kwargs['voter_list'] if 'voter_list' in kwargs else []
+            self.vote_count = kwargs['vote_count'] if 'vote_count' in kwargs else 0
+
         except Exception as e:
             print("Track object creation failed: ", e)
 
@@ -88,6 +85,7 @@ class Track(Document):
             'track_id': str(self.track_id),
             'voter_list': self.voter_list,
             'vote_count': self.vote_count,
+            'id': self.id
         }
         return dict
 
@@ -98,8 +96,11 @@ class Track(Document):
 
     def save(self, **kwargs):
         self.pre_save()
+        super(Track, self).save()
+
+    def new_save(self, **kwargs):
         if not self.track_exists():
-            super(Track, self).save()
+            self.save(kwargs)
 
     def _add_audio_analysis(self):
         me_headers = {'Authorization': 'Bearer {}'.format(tokens.get_access_token())}
