@@ -30,6 +30,7 @@ class GetTracksInputSchema(Schema):
 class TrackSchema(Schema):
     artist = fields.Str()
     danceability = fields.Float()
+    id = fields.Str()
     liveness = fields.Float()
     name = fields.Str()
     playlist_id = fields.Str()
