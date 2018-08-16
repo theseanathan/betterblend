@@ -37,11 +37,12 @@ Response:
   tracks: [
     {
       artist: str,
+      id: str
       name: str,
       playlist_id: str,
       track_id: str,
       vote_count: int,
-      voter_list: list[str]
+      voter_list: list[str],
     }, 
   	...
   ]
