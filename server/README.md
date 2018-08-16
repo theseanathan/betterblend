@@ -26,8 +26,7 @@ Calls out to Spotify API to get information necessary for the web app and handle
 
 ### Tracks
 `[PUT] /vote_track` Up or down votes a particular track in the playlist. <br>
-Request: `track_id [str]`, `playlist_id [str]` and `vote [int]` <br>
-TODO: Possibly rather than use track_id and playlist_id, just using the Mongo document ObjectId
+Request: `id [str]` which is the mongo_id, and `vote [int]` <br>
 <br> <br>
 `[GET] /get_tracks` Used to get tracks of a particular playlist. <br>
 Request: `id` of playlist as querystring param <br>
