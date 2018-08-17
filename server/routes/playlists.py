@@ -40,7 +40,6 @@ class Playlists:
 
         for playlist_item in playlists_data:
             playlist = Playlist(playlist_item)
-            playlist.get_tracks()
 
             playlist_data, error = playlist_schema.dump(playlist)
             playlists['playlists'].append(playlist_data)

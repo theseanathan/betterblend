@@ -11,10 +11,9 @@ class SpotifyCallException(Exception):
     pass
 
 
-headers = {'Authorization': 'Bearer {}'.format(tokens.get_access_token())}
-
-
 def get(href: str):
+    headers = {'Authorization': 'Bearer {}'.format(tokens.get_access_token())}
+
     log.info('Calling spotify API')
     response = requests.get(href, headers=headers)
 
