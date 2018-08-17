@@ -63,9 +63,6 @@ def get_tracks(id):
 
     tracks = Track.objects(playlist_id=id)
 
-    import pdb
-    pdb.set_trace()
-
     return tracks
 
 
