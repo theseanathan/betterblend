@@ -100,7 +100,7 @@ class Track(Document):
 
     def new_save(self, **kwargs):
         if not self.track_exists():
-            self.save(kwargs)
+            self.save()
 
     def _add_audio_analysis(self):
         me_headers = {'Authorization': 'Bearer {}'.format(tokens.get_access_token())}
