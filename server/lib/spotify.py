@@ -63,6 +63,9 @@ def get_tracks(id):
 
     tracks = Track.objects(playlist_id=id)
 
+    import pdb
+    pdb.set_trace()
+
     return tracks
 
 
@@ -75,7 +78,8 @@ def _add_tracks_to_mongo(tracks, playlist_id):
             try:
                 track.new_save()
             except Exception as e:
-                log.info("Exception thrown when saving track")
+                log.exception("Exception thrown when saving track to Mongo.")
+                log.info('Track failed: {}'.format(track.track_id))
 
 
 def _get_track(mongo_id):
@@ -85,7 +89,8 @@ def _get_track(mongo_id):
     except Track.DoesNotExist as e:
         log.info('Track does not exist.')
     except Exception as e:
-        log.info("Exception was thrown when getting track from Mongo.", e)
+        log.exception("Exception was thrown when getting track from Mongo.")
+        log.info('Track failed: {}'.format(track.id))
 
 
 
