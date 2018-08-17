@@ -1,48 +1,16 @@
-from flask import make_response
-import json
-import logging
-import requests
-import sys
-
 from server import settings
-from server.lib import tokens
+from server.resources import spotify
+from server.lib.log import log
 from server.models.playlist import Playlist
 from server.models.track import Track
-
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.INFO)
-ch.setFormatter(logging.Formatter('[%(levelname)s]|[%(name)s - %(asctime)s]: %(message)s'))
-
-log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
-
-log.addHandler(ch)
-
-PLAYLIST_NAME = 'playlist_{}'
-
-
-class SpotifyCallException(Exception):
-    pass
-
-
-headers = {'Authorization': 'Bearer {}'.format(tokens.get_access_token())}
-
-
-def get(href: str):
-    response = requests.get(href, headers=headers)
-
-    if response.status_code != 200:
-        raise SpotifyCallException('Spotify request failed with the status code: {}'.format(response.status_code))
-    else:
-        return json.loads(response.text)
 
 
 def _get_tracks_from_spotify(playlist_id):
     log.info('Getting tracks from spotify.')
     url = settings.API_GET_PLAYLIST.format(id=playlist_id)
-    response = requests.get(url, headers=headers)
+    response = spotify.get(url)
 
-    playlist_info = json.loads(response.text)
+    playlist_info = response
     playlist = Playlist(playlist_info)
 
     tracks = []
@@ -84,11 +52,10 @@ def _get_track(mongo_id):
         track = Track.objects.get(id=mongo_id)
         return track
     except Track.DoesNotExist as e:
-        log.info('Track does not exist.')
+        log.exception('Track does not exist.')
     except Exception as e:
         log.exception("Exception was thrown when getting track from Mongo.")
         log.info('Track failed: {}'.format(track.id))
-
 
 
 # TODO: Add a unique user account to add to voters_list for track s.t. people can't vote twice

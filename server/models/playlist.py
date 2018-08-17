@@ -1,7 +1,7 @@
 import requests
 import json
 
-from server.lib import spotify
+from server.resources import spotify
 from server.lib import tokens
 from server.models.track import Track
 
@@ -32,10 +32,6 @@ class Playlist:
 
     def __str__(self):
         return str(self.to_log())
-
-    def get_tracks(self):
-        playlist_info = spotify.get(self.href)
-        self.tracks = playlist_info['tracks']['items']
 
     def save(self):
         for track in self.tracks:

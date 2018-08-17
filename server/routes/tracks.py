@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, make_response
 from webargs.flaskparser import use_args
 
-from server.lib import spotify
+from server.lib import tracks
+from server.lib.log import log
 from server.schemas.spotify import (
     GetTracksInputSchema,
     GetTracksResponseSchema,
@@ -25,18 +26,19 @@ class Tracks:
         id = req.get('id')
 
         try:
-            tracks = spotify.get_tracks(id)
+            spotify_tracks = tracks.get_tracks(id)
             track_schema = TrackSchema()
             tracks_schema = GetTracksResponseSchema()
             tracks_obj = {'tracks': []}
 
-            for track in tracks:
+            for track in spotify_tracks:
                 track_data, error = track_schema.dump(track)
                 tracks_obj['tracks'].append(track_data)
 
             tracks_response, error = tracks_schema.dump(tracks_obj)
             return jsonify(tracks_response)
         except Exception as e:
+            log.exception('An exception occurred at the get_playlist endpoint.')
             return str(e)
 
     @tracks_blueprint.route('/vote_track', methods=['PUT'])
@@ -53,7 +55,7 @@ class Tracks:
         vote = req.get('vote')
 
         try:
-            return spotify.vote_track(id, vote)
+            return tracks.vote_track(id, vote)
         except Exception as e:
             return make_response(str(e), 500)
 

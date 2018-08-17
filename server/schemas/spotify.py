@@ -31,6 +31,7 @@ class TrackSchema(Schema):
     artist = fields.Str()
     danceability = fields.Float()
     id = fields.Str()
+    image = fields.Nested(ImageSchema)
     liveness = fields.Float()
     name = fields.Str()
     playlist_id = fields.Str()

@@ -16,6 +16,7 @@ import requests
 
 from server import settings
 from server.lib import tokens
+from server.resources import spotify
 
 connect(settings.DB)
 
@@ -73,6 +74,7 @@ class Track(Document):
     track_number = IntField()
     type = StringField()
     uri = StringField()
+    image = DictField()
 
     def to_log(self):
         dict = {
@@ -92,6 +94,8 @@ class Track(Document):
     def pre_save(self):
         if self.playlist_id is None:
             raise TrackException('Every track needs to have a playlist_id')
+        if not self.image:
+            self.set_image()
         self._add_audio_analysis()
 
     def save(self, **kwargs):
@@ -121,3 +125,8 @@ class Track(Document):
         if tracks:
             return True
         return False
+
+    def set_image(self):
+        track_url = 'tracks/{id}'.format(id=self.track_id)
+        track_data = spotify.get(settings.API_URL_BASE.format(endpoint=track_url))
+        self.image = track_data['album']['images'][-1:][0]

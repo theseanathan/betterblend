@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 
 from server import settings
-from server.lib import spotify
+from server.resources import spotify
 from server.models.playlist import Playlist
 from server.schemas.spotify import PlaylistSchema, GetPlaylistSchema
 
@@ -40,7 +40,6 @@ class Playlists:
 
         for playlist_item in playlists_data:
             playlist = Playlist(playlist_item)
-            playlist.get_tracks()
 
             playlist_data, error = playlist_schema.dump(playlist)
             playlists['playlists'].append(playlist_data)
