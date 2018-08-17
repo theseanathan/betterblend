@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import './css/playlist.css';
 import axios from 'axios';
-import _ from 'lodash';
+import {Link} from 'react-router-dom';
 
 class Home extends Component {
 
@@ -19,30 +19,28 @@ class Home extends Component {
 
 	getPlaylists = () => {
 		axios.get('/get_playlists')
-		.then(data => this.setState({playlists: data.data.playlists}));
+		.then(data => {
+			let modPlaylists = data.data.playlists.map(function(p) {
+				if(Object.keys(p.image).length === 0) {
+					p.image = {"height":60, "width":60, "url":"http://via.placeholder.com/60x60"};
+				} return p;
+			}); this.setState({playlists: modPlaylists});
+		});
 	};
 
 	render() {
-        this.state.playlists = this.state.playlists.filter(function(playlist) {
-            if (!_.isEmpty(playlist.image)) {
-                console.log("NON-EMPTY PLAYLIST: " + JSON.stringify(playlist));
-                return playlist;
-            } else {
-                console.log("EMPTY PLAYLIST: " + JSON.stringify(playlist));
-            }
-        });
-
-        console.log(this.state.playlists);
-
+        //console.log(this.state.playlists);
 		return (
 			<div className={this.state.classnames}>
 				{this.state.playlists.map(p => 
-					<a href="/tracks" className="playlist-link" key={p.id}><div className="playlist-div">
-						<div className="left-style">
-                            <img src={p.image.url} alt=""/>
+					<Link to={'/playlist/'+p.id} className="playlist-link" key={p.id}>
+						<div className="playlist-div">
+							<div className="left-style">
+                           	 	<img src={p.image.url} alt=""/>
+							</div>
+							<p className="playlist-title">{p.name}</p>
 						</div>
-						<p className="playlist-title">{p.name}</p>
-					</div></a>
+					</Link>
 				)}
 			</div>
 		);
