@@ -1,5 +1,5 @@
 from server import settings
-from server.lib import spotify
+from server.resources import spotify
 from server.lib.log import log
 from server.models.playlist import Playlist
 from server.models.track import Track

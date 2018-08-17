@@ -16,7 +16,7 @@ import requests
 
 from server import settings
 from server.lib import tokens
-from server.lib import spotify
+from server.resources import spotify
 
 connect(settings.DB)
 
