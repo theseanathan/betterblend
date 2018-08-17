@@ -3,8 +3,8 @@ import ReactDOM from 'react-dom';
 import { 
 	BrowserRouter as Router,
 	Switch,
-	Route,
-	Link 
+	Route
+	//Link 
 } from 'react-router-dom';
 import Home from './Home.js';
 import Login from './components/Login.js';
@@ -26,7 +26,7 @@ const Main = () => (
 		<Switch>
 			<Route exact path='/' component={Login}/>
 			<Route path='/playlists' component={Home}/>
-			<Route path='/tracks' component={Track}/>
+			<Route name='/playlists/:idNum' component={Track}/>
 		</Switch>
 	</main>
 )

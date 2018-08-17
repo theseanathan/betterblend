@@ -12,7 +12,9 @@ def _get_token():
 
 def is_token_valid():
     token = _get_token()
-    return datetime.now() < token['expiration']
+    if token:
+        return datetime.now() < token['expiration']
+    return False
 
 
 def get_refresh_token():

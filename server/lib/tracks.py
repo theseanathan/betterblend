@@ -43,7 +43,8 @@ def _add_tracks_to_mongo(tracks, playlist_id):
             try:
                 track.new_save()
             except Exception as e:
-                log.exception("Exception thrown when saving track")
+                log.exception("Exception thrown when saving track to Mongo.")
+                log.info('Track failed: {}'.format(track.track_id))
 
 
 def _get_track(mongo_id):
@@ -54,7 +55,7 @@ def _get_track(mongo_id):
         log.exception('Track does not exist.')
     except Exception as e:
         log.exception("Exception was thrown when getting track from Mongo.")
-
+        log.info('Track failed: {}'.format(track.id))
 
 
 # TODO: Add a unique user account to add to voters_list for track s.t. people can't vote twice

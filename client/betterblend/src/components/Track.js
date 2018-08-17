@@ -9,26 +9,45 @@ class Track extends Component {
 		super();
 		this.state = {
 			classnames: '',
-			tracks: []
+			tracks: [
+				{
+				  'image': 'http://via.placeholder.com/60x60',
+			      'artist': 'artist',
+			      'id': 'dfjksdf',
+			      'name': 'name-test',
+			      'playlist_id': 'dffsd',
+			      'track_id': 'dsfsf',
+			      'vote_count': 69,
+			      'voter_list': []
+			    }
+			]
 		}
 	}
 
 	componentDidMount() {
-		this.getPlaylists();
+		this.getTracks();
 	}
-
-	getPlaylists = () => {
-		axios.get('/api')
-		.then(data => this.setState({tracks: data.data.tracks}));
+	
+	getTracks = () => {
+		const trackUrl = '/get_playlist?id='+ this.props.location.pathname.substring(10);
+		axios.get(trackUrl)
+		.then(data => {
+			let modTracks = data.data.tracks.map(function(t) {
+				if(!('image' in t)) {
+					t['image'] = "http://via.placeholder.com/60x60";
+				} return t;
+			}); this.setState({tracks: modTracks});
+		});
 	};
 
 	render() {
+		console.log('id: ', this.props.location.pathname.substring(10));
 		return (
 			<div className={this.state.classnames}>
 				{this.state.tracks.map(p => 
-					<div className="track-container" key={p.id}>
+					<div className="track-container" key={p.track_id}>
 						<div className="left-style">
-							<img src={p.img} alt=""/>
+							<img src={p.image} alt=""/>
 						</div>
 						<div className="track-data">
 							<p className="song-title"><b>{p.name}</b></p>
@@ -37,7 +56,7 @@ class Track extends Component {
 						<div className="song-data">
 							<div className="vote-buttons"><a><i className="fa fa-caret-up fa-lg"></i></a></div>
 							<div className="vote-buttons"><a><i className="fa fa-caret-down fa-lg"></i></a></div>
-							<div><p className="count-num">{p.count}</p></div>
+							<div><p className="count-num">{p.vote_count}</p></div>
 						</div>
 					</div>
 				)}
