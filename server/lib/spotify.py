@@ -75,7 +75,7 @@ def _add_tracks_to_mongo(tracks, playlist_id):
             try:
                 track.new_save()
             except Exception as e:
-                log.info("Exception thrown when saving track", exception=e)
+                log.info("Exception thrown when saving track")
 
 
 def _get_track(mongo_id):
