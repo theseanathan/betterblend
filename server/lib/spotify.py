@@ -1,18 +1,8 @@
 import json
-import logging
 import requests
-import sys
 
 from server.lib import tokens
-
-ch = logging.StreamHandler(sys.stdout)
-ch.setLevel(logging.INFO)
-ch.setFormatter(logging.Formatter('[%(levelname)s]|[%(name)s - %(asctime)s]: %(message)s'))
-
-log = logging.getLogger(__name__)
-log.setLevel(logging.INFO)
-
-log.addHandler(ch)
+from server.lib.log import log
 
 PLAYLIST_NAME = 'playlist_{}'
 
@@ -32,5 +22,3 @@ def get(href: str):
         raise SpotifyCallException('Spotify request failed with the status code: {}'.format(response.status_code))
     else:
         return json.loads(response.text)
-
-

@@ -94,6 +94,8 @@ class Track(Document):
     def pre_save(self):
         if self.playlist_id is None:
             raise TrackException('Every track needs to have a playlist_id')
+        if not self.image:
+            self.set_image()
         self._add_audio_analysis()
 
     def save(self, **kwargs):
@@ -102,7 +104,7 @@ class Track(Document):
 
     def new_save(self, **kwargs):
         if not self.track_exists():
-            self.save(kwargs)
+            self.save()
 
     def _add_audio_analysis(self):
         me_headers = {'Authorization': 'Bearer {}'.format(tokens.get_access_token())}
@@ -124,9 +126,7 @@ class Track(Document):
             return True
         return False
 
-    # TODO: Call track/{id} to get image url
     def set_image(self):
         track_url = 'tracks/{id}'.format(id=self.track_id)
         track_data = spotify.get(settings.API_URL_BASE.format(endpoint=track_url))
-        import pdb
-        pdb.set_trace()
+        self.image = track_data['album']['images'][-1:][0]
