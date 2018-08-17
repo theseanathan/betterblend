@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, make_response
 from webargs.flaskparser import use_args
 
-from server.lib import spotify
+from server.lib import tracks
 from server.schemas.spotify import (
     GetTracksInputSchema,
     GetTracksResponseSchema,
@@ -25,7 +25,7 @@ class Tracks:
         id = req.get('id')
 
         try:
-            tracks = spotify.get_tracks(id)
+            tracks = tracks.get_tracks(id)
             track_schema = TrackSchema()
             tracks_schema = GetTracksResponseSchema()
             tracks_obj = {'tracks': []}
@@ -53,7 +53,7 @@ class Tracks:
         vote = req.get('vote')
 
         try:
-            return spotify.vote_track(id, vote)
+            return tracks.vote_track(id, vote)
         except Exception as e:
             return make_response(str(e), 500)
 
