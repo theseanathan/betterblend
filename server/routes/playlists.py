@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify
 
 from server import settings
-from server.lib import spotify
+from server.resources import spotify
 from server.models.playlist import Playlist
 from server.schemas.spotify import PlaylistSchema, GetPlaylistSchema
 

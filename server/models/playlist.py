@@ -1,7 +1,7 @@
 import requests
 import json
 
-from server.lib import spotify
+from server.resources import spotify
 from server.lib import tokens
 from server.models.track import Track
 
