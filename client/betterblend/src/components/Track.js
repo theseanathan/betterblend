@@ -31,7 +31,7 @@ class Track extends Component {
 		//console.log('id: ', this.props.location.pathname.substring(10));
 		return (
 			<div className={this.state.classnames}>
-				{this.state.tracks.map(p => 
+				{this.state.tracks.map((p, i) => 
 					<div className="track-container" key={p.track_id}>
 						<div className="left-style">
 							<img src={p.image.url} alt=""/>
@@ -40,7 +40,7 @@ class Track extends Component {
 							<p className="song-title"><b>{p.name}</b></p>
 							<p className="artist">{p.artist}</p>
 						</div>
-						<TrackForm trackInfo={p}/>
+						<TrackForm trackInfo={p} index={i}/>
 					</div>
 				)}
 			</div>
