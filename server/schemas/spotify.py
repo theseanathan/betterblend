@@ -18,7 +18,7 @@ class GetPlaylistSchema(Schema):
     playlists = fields.List(fields.Nested(PlaylistSchema))
 
 
-class PutTrackInputSchema(GetPlaylistSchema):
+class PutTrackInputSchema(Schema):
     vote = fields.Int(required=True)
     id = fields.Str(required=True)
 

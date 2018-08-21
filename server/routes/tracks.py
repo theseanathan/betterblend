@@ -42,7 +42,7 @@ class Tracks:
             return str(e)
 
     @tracks_blueprint.route('/vote_track', methods=['PUT'])
-    @use_args(PutTrackInputSchema, locations=['querystring', 'json'])
+    @use_args(PutTrackInputSchema)
     def vote_track(req):
         """
         Vote up/down track
@@ -55,7 +55,7 @@ class Tracks:
         vote = req.get('vote')
 
         try:
-            return tracks.vote_track(id, vote)
+            return make_response(tracks.vote_track(id, vote), 200)
         except Exception as e:
             return make_response(str(e), 500)
 
