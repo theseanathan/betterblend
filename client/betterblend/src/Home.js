@@ -33,7 +33,7 @@ class Home extends Component {
 		return (
 			<div className={this.state.classnames}>
 				{this.state.playlists.map(p => 
-					<Link to={'/playlist/'+p.id} className="playlist-link" key={p.id}>
+					<Link to={'/playlist/'+p.playlist_id} className="playlist-link" key={p.id}>
 						<div className="playlist-div">
 							<div className="left-style">
                            	 	<img src={p.image.url} alt=""/>

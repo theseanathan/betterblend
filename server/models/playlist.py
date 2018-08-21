@@ -1,46 +1,81 @@
-import requests
-import json
+from bson.objectid import ObjectId
+from mongoengine import (
+    Document,
+    StringField,
+    ObjectIdField,
+    DictField,
+    BooleanField,
+    ListField,
+)
 
-from server.resources import spotify
-from server.lib import tokens
-from server.models.track import Track
+from server import settings
 
 
-class Playlist:
-    def __init__(self, kwargs):
+class Playlist(Document):
+    meta = {'collection': 'playlists'}
+
+    collaborative = BooleanField()
+    external_urls = DictField()
+    href = StringField()
+    id = ObjectIdField(primary_key=True)
+    image = DictField()
+    images = ListField(DictField())
+    name = StringField()
+    owner = DictField()
+    playlist_id = StringField()
+    primary_color = StringField()
+    public = BooleanField()
+    snapshot_id = StringField()
+    tracks = DictField()
+    type = StringField()
+    uri = StringField()
+
+    def __init__(self, *args, **kwargs):
+        super(Playlist, self).__init__(**kwargs)
+
         try:
             self.href = kwargs['href']
-            self.id = kwargs['id']
+            self.id = kwargs['id'] if 'playlist_id' in kwargs else ObjectId()
+            self.images = kwargs['images']
+            self.image = None
             self.name = kwargs['name']
-            self.image = kwargs['images']
-            self.tracks = kwargs['tracks']
+            self.playlist_id = kwargs['playlist_id'] if 'playlist_id' in kwargs else kwargs['id']
 
-            for img in self.image:
+            for img in self.images:
                 if img['height'] == 60:
                     self.image = img
         except Exception as e:
             print("No item attribute, ", e)
 
+    def set_image(self, image_obj):
+        self.image = image_obj
+
+    def pre_save(self):
+        if not self.image:
+            self.set_image(settings.DEFAULT_IMAGE)
+
+    def exists(self):
+        if Playlist.objects(playlist_id=self.playlist_id):
+            return True
+        return False
+
+    def save(self):
+        self.pre_save()
+        super(Playlist, self).save()
+
+    def new_save(self):
+        if not self.exists():
+            self.save()
+
     def to_log(self):
         dict = {
             'href': self.href,
-            'id': self.id,
+            'id': self.playlist_id,
             'image': self.image,
+            'mongo_id': self.id,
             'name': self.name,
         }
         return dict
 
     def __str__(self):
         return str(self.to_log())
-
-    def save(self):
-        for track in self.tracks:
-            href = track['href']
-            access_token = tokens.get_access_token()
-
-            me_headers = {'Authorization': 'Bearer {}'.format(access_token)}
-            track_dict = requests.get(href, headers=me_headers)
-
-            track_object = json.loads(track_dict.text)
-            track = Track(track_object)
-            track.save()

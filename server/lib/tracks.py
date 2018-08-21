@@ -10,12 +10,9 @@ def _get_tracks_from_spotify(playlist_id):
     url = settings.API_GET_PLAYLIST.format(id=playlist_id)
     response = spotify.get(url)
 
-    playlist_info = response
-    playlist = Playlist(playlist_info)
-
     tracks = []
 
-    for track in playlist.tracks['items']:
+    for track in response['tracks']['items']:
         track['track']['playlist_id'] = playlist_id
         track['track']['album'] = track['track']['album']['name']
 

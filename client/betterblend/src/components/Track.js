@@ -47,7 +47,7 @@ class Track extends Component {
 				{this.state.tracks.map(p => 
 					<div className="track-container" key={p.track_id}>
 						<div className="left-style">
-							<img src={p.image} alt=""/>
+							<img src={p.image.url} alt=""/>
 						</div>
 						<div className="track-data">
 							<p className="song-title"><b>{p.name}</b></p>
