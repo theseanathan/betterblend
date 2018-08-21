@@ -2,6 +2,7 @@ from flask import Blueprint, jsonify, make_response
 from webargs.flaskparser import use_args
 
 from server.lib import tracks
+from server.lib import playlists
 from server.lib.log import log
 from server.schemas.spotify import (
     GetTracksInputSchema,
@@ -29,11 +30,17 @@ class Tracks:
             spotify_tracks = tracks.get_tracks(id)
             track_schema = TrackSchema()
             tracks_schema = GetTracksResponseSchema()
-            tracks_obj = {'tracks': []}
+            tracks_obj = {
+                'tracks': [],
+                'playlist': playlists.get_playlist_name(playlist_id=id),
+                'tracks_count': 0
+            }
 
             for track in spotify_tracks:
                 track_data, error = track_schema.dump(track)
                 tracks_obj['tracks'].append(track_data)
+
+            tracks_obj['tracks_count'] = len(tracks_obj['tracks'])
 
             tracks_response, error = tracks_schema.dump(tracks_obj)
             return jsonify(tracks_response)

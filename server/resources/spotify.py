@@ -18,6 +18,7 @@ def get(href: str):
     response = requests.get(href, headers=headers)
 
     if response.status_code != 200:
+        log.info('Spotify request fail, URL: {}'.format(href))
         raise SpotifyCallException('Spotify request failed with the status code: {}'.format(response.status_code))
     else:
         return json.loads(response.text)
