@@ -18,20 +18,16 @@ class Track_Form extends Component {
 		//axios.put('/vote_track?id='+this.props.trackInfo.id+'?vote=1')
 		//.then().catch(err => console.log(err.response.data));
 		axios.put('/vote_track', {
-			params: {
-				id: this.props.trackInfo.id,
-				vote: 1
-			}
+            'id': this.props.trackInfo.id,
+            'vote': 1
 		}).then().catch(err => console.log(err.response.data));
 	};
 
 	downVote = (e) => {
 		e.preventDefault();
 		axios.put('/vote_track', {
-			params: {
-				id: this.props.trackInfo.id,
-				vote: -1
-			}
+            id: this.props.trackInfo.id,
+            vote: -1
 		}).then().catch(err => console.log(err.response.data));
 	};
 
