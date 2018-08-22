@@ -17,7 +17,8 @@ class Track extends Component {
         const socket = io('http://localhost:5000')
         socket.on('connect', () => {
             socket.on('VOTED', (response) => {
-                console.log('On \'VOTED\': ', response);
+                console.log('response.tracks: ', response.tracks);
+                this.setState({tracks: response.tracks});
             })
         });
 	}
@@ -27,12 +28,11 @@ class Track extends Component {
 	}
 	
 	getTracks = () => {
-		const trackUrl = '/get_playlist?id='+ this.props.location.pathname.substring(10);
-		axios.get(trackUrl)
-		.then(data => {
-			//console.log(data.data.tracks);
-			this.setState({tracks: data.data.tracks});
-		});
+        const trackUrl = '/get_playlist?id='+ this.props.location.pathname.substring(10);
+        axios.get(trackUrl)
+        .then(data => {
+            this.setState({tracks: data.data.tracks});
+        });
 	};
 
 	render() {
