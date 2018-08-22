@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import '../css/playlist.css';
 import axios from 'axios';
 import 'font-awesome/css/font-awesome.min.css';
+import io from 'socket.io-client'
 
 class Track extends Component {
 
@@ -22,6 +23,18 @@ class Track extends Component {
 			    }
 			]
 		}
+
+        const socket = io('http://localhost:5000')
+        socket.on('connect', () => {
+            console.log('CONNECTED TO THE FLASK SOCKET!');
+            socket.emit('connected', '12345', (response) => {
+                console.log('EMITTED TO FLASK SOCKET!', response);
+            })
+
+            socket.on('playlist', (response) => {
+                console.log('ON PLAYLIST EMIT!!: ', response);
+            })
+        });
 	}
 
 	componentDidMount() {
