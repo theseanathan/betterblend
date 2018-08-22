@@ -28,17 +28,7 @@ class Tracks:
         id = req.get('id')
 
         try:
-            spotify_tracks = tracks.get_tracks(id)
-            track_schema = TrackSchema()
-            tracks_schema = GetTracksResponseSchema()
-            tracks_obj = {'tracks': []}
-
-            for track in spotify_tracks:
-                track_data, error = track_schema.dump(track)
-                tracks_obj['tracks'].append(track_data)
-
-            tracks_response, error = tracks_schema.dump(tracks_obj)
-            return jsonify(tracks_response)
+            return jsonify(_get_tracks_obj(id))
         except Exception as e:
             log.exception('An exception occurred at the get_playlist endpoint.')
             return str(e)
@@ -66,3 +56,17 @@ class Tracks:
     @tracks_blueprint.route('/add_track', methods=['POST'])
     def add_track(self):
         pass
+
+
+def _get_tracks_obj(playlist_id):
+    spotify_tracks = tracks.get_tracks(playlist_id)
+    track_schema = TrackSchema()
+    tracks_schema = GetTracksResponseSchema()
+    tracks_obj = {'tracks': []}
+
+    for track in spotify_tracks:
+        track_data, error = track_schema.dump(track)
+        tracks_obj['tracks'].append(track_data)
+
+    tracks_response, error = tracks_schema.dump(tracks_obj)
+    return tracks_response
