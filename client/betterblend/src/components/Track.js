@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import '../css/playlist.css';
 import axios from 'axios';
 import 'font-awesome/css/font-awesome.min.css';
+import io from 'socket.io-client'
 
 class Track extends Component {
 
@@ -22,6 +23,13 @@ class Track extends Component {
 			    }
 			]
 		}
+
+        const socket = io('http://localhost:5000')
+        socket.on('connect', () => {
+            socket.on('VOTED', (response) => {
+                console.log('On \'VOTED\': ', response);
+            })
+        });
 	}
 
 	componentDidMount() {
@@ -41,7 +49,6 @@ class Track extends Component {
 	};
 
 	render() {
-		console.log('id: ', this.props.location.pathname.substring(10));
 		return (
 			<div className={this.state.classnames}>
 				{this.state.tracks.map(p => 

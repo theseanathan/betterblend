@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, make_response
+from flask_socketio import SocketIO
 from webargs.flaskparser import use_args
 
 from server.lib import tracks
@@ -13,6 +14,7 @@ from server.schemas.spotify import (
 
 
 tracks_blueprint = Blueprint('tracks', __name__)
+socket_io = SocketIO()
 
 
 class Tracks:
@@ -62,10 +64,20 @@ class Tracks:
         vote = req.get('vote')
 
         try:
-            return tracks.vote_track(id, vote)
+            playlist_id = tracks._get_track(id).playlist_id
+            socket_io.emit('VOTED', _get_tracks_obj(playlist_id))
+            return make_response(tracks.vote_track(id, vote), 200)
         except Exception as e:
             return make_response(str(e), 500)
 
     @tracks_blueprint.route('/add_track', methods=['POST'])
     def add_track(self):
         pass
+
+
+    @socket_io.on('connected')
+    def poll_playlist(playlist_id):
+        print('CONNECTED TO SOCKET! ', playlist_id)
+        emit('playlist', {'msg': 'HELLOOOOOOOO'})
+        return 'HELLOOOOOOOO WORLD'
+
