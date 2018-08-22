@@ -1,25 +1,32 @@
 from server import settings
 from server.resources import spotify
 from server.lib.log import log
-from server.models.playlist import Playlist
 from server.models.track import Track
 
 
 def _get_tracks_from_spotify(playlist_id):
     log.info('Getting tracks from spotify.')
     url = settings.API_GET_PLAYLIST.format(id=playlist_id)
-    response = spotify.get(url)
 
+    response = spotify.get(url)['tracks']
     tracks = []
 
-    for track in response['tracks']['items']:
+    _add_tracks_to_list(response['items'], tracks, playlist_id)
+
+    while response['next']:
+        response = spotify.get(response['next'])
+        _add_tracks_to_list(response['items'], tracks, playlist_id)
+
+    return tracks
+
+
+def _add_tracks_to_list(response_items, tracks, playlist_id):
+    for track in response_items:
         track['track']['playlist_id'] = playlist_id
         track['track']['album'] = track['track']['album']['name']
 
         track_model = Track(**track['track'])
         tracks.append(track_model)
-
-    return tracks
 
 
 def get_tracks(id):
