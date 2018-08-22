@@ -66,11 +66,3 @@ class Tracks:
     @tracks_blueprint.route('/add_track', methods=['POST'])
     def add_track(self):
         pass
-
-
-    @socket_io.on('connected')
-    def poll_playlist(playlist_id):
-        print('CONNECTED TO SOCKET! ', playlist_id)
-        emit('playlist', {'msg': 'HELLOOOOOOOO'})
-        return 'HELLOOOOOOOO WORLD'
-
