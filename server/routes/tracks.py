@@ -47,9 +47,10 @@ class Tracks:
         vote = req.get('vote')
 
         try:
+            vote_track_response = tracks.vote_track(id, vote)
             playlist_id = tracks._get_track(id).playlist_id
             socket_io.emit('VOTED', _get_tracks_obj(playlist_id))
-            return make_response(tracks.vote_track(id, vote), 200)
+            return make_response(vote_track_response, 200)
         except Exception as e:
             return make_response(str(e), 500)
 
