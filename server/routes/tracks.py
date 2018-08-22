@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, make_response
-from flask_socketio import emit, SocketIO
+from flask_socketio import SocketIO
 from webargs.flaskparser import use_args
 
 from server.lib import tracks
@@ -57,6 +57,8 @@ class Tracks:
         vote = req.get('vote')
 
         try:
+            playlist_id = tracks._get_track(id).playlist_id
+            socket_io.emit('VOTED', _get_tracks_obj(playlist_id))
             return make_response(tracks.vote_track(id, vote), 200)
         except Exception as e:
             return make_response(str(e), 500)

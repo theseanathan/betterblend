@@ -16,13 +16,8 @@ class Track extends Component {
 
         const socket = io('http://localhost:5000')
         socket.on('connect', () => {
-            console.log('CONNECTED TO THE FLASK SOCKET!');
-            socket.emit('connected', '12345', (response) => {
-                console.log('EMITTED TO FLASK SOCKET!', response);
-            })
-
-            socket.on('playlist', (response) => {
-                console.log('ON PLAYLIST EMIT!!: ', response);
+            socket.on('VOTED', (response) => {
+                console.log('On \'VOTED\': ', response);
             })
         });
 	}
@@ -41,7 +36,6 @@ class Track extends Component {
 	};
 
 	render() {
-		//console.log('id: ', this.props.location.pathname.substring(10));
 		return (
 			<div className={this.state.classnames}>
 				{this.state.tracks.map((p, i) => 
