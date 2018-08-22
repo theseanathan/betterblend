@@ -1,6 +1,7 @@
-import React, { Component } from 'react';
 import '../css/playlist.css';
 import axios from 'axios';
+import io from 'socket.io-client'
+import React, { Component } from 'react';
 
 class Track_Form extends Component {
 
@@ -12,6 +13,13 @@ class Track_Form extends Component {
 		}
 		this.upVote = this.upVote.bind(this);
 		this.downVote = this.downVote.bind(this);
+
+        const socket = io('http://localhost:5000')
+        socket.on('connect', () => {
+            socket.on('VOTED', (response) => {
+                this.setState({counts: response.tracks[this.props.index].vote_count});
+            });
+        });
 	}
 
 	upVote = (e) => {
@@ -19,7 +27,7 @@ class Track_Form extends Component {
 		axios.put('/vote_track', {
             'id': this.props.trackInfo.id,
             'vote': 1
-		}).then(this.update()).catch(err => console.log(err.response));
+		}).then().catch(err => console.log(err.response));
 	};
 
 	downVote = (e) => {
@@ -27,16 +35,7 @@ class Track_Form extends Component {
 		axios.put('/vote_track', {
             id: this.props.trackInfo.id,
             vote: -1
-		}).then(this.update()).catch(err => console.log(err.response.data));
-	};
-
-	update = (props) => {
-		const trackUrl = '/get_playlist?id='+ this.props.trackInfo.playlist_id;
-		axios.get(trackUrl)
-		.then(data => {
-			let ind = this.props.index;
-			this.setState({counts: data.data.tracks[ind].vote_count});
-		});
+		}).then().catch(err => console.log(err.response.data));
 	};
 
 	render() {

@@ -17,9 +17,8 @@ class Track extends Component {
         const socket = io('http://localhost:5000')
         socket.on('connect', () => {
             socket.on('VOTED', (response) => {
-                console.log('response.tracks: ', response.tracks);
-                this.setState({tracks: response.tracks});
-            })
+                this.render();
+            });
         });
 	}
 
@@ -38,16 +37,16 @@ class Track extends Component {
 	render() {
 		return (
 			<div className={this.state.classnames}>
-				{this.state.tracks.map((p, i) => 
-					<div className="track-container" key={p.track_id}>
+				{this.state.tracks.map((track, i) => 
+					<div className="track-container" key={track.track_id}>
 						<div className="left-style">
-							<img src={p.image.url} alt=""/>
+							<img src={track.image.url} alt=""/>
 						</div>
 						<div className="track-data">
-							<p className="song-title"><b>{p.name}</b></p>
-							<p className="artist">{p.artist}</p>
+							<p className="song-title"><b>{track.name}</b></p>
+							<p className="artist">{track.artist}</p>
 						</div>
-						<TrackForm trackInfo={p} index={i}/>
+						<TrackForm trackInfo={track} index={i}/>
 					</div>
 				)}
 			</div>
