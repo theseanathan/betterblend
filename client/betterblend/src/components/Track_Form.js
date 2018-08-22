@@ -40,7 +40,6 @@ class Track_Form extends Component {
 	};
 
 	render() {
-		//console.log(this.props);
 		return (
 			<div className={this.state.classnames}>
 				<div className="vote-buttons" onClick={this.upVote}><a><i className="fa fa-caret-up fa-lg"></i></a></div>
