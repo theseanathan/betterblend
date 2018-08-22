@@ -27,7 +27,7 @@ class Track_Form extends Component {
 		axios.put('/vote_track', {
             id: this.props.trackInfo.id,
             vote: -1
-		}).then(this.update()).catch(err => console.log(err.response.data));
+		}).then(this.update()).catch(err => console.log(err.response));
 	};
 
 	update = (props) => {
