@@ -68,5 +68,6 @@ def vote_track(mongo_id, vote):
         track = _get_track(mongo_id)
         track.vote_count += vote
         track.save()
+        return 'Track {} was voted successfully.'.format(mongo_id)
     except:
         raise

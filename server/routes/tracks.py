@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, make_response
+from flask_socketio import SocketIO
 from webargs.flaskparser import use_args
 
 from server.lib import tracks
@@ -13,6 +14,7 @@ from server.schemas.spotify import (
 
 
 tracks_blueprint = Blueprint('tracks', __name__)
+socket_io = SocketIO()
 
 
 class Tracks:
@@ -27,29 +29,13 @@ class Tracks:
         id = req.get('id')
 
         try:
-            spotify_tracks = tracks.get_tracks(id)
-            track_schema = TrackSchema()
-            tracks_schema = GetTracksResponseSchema()
-            tracks_obj = {
-                'tracks': [],
-                'playlist': playlists.get_playlist_name(playlist_id=id),
-                'tracks_count': 0
-            }
-
-            for track in spotify_tracks:
-                track_data, error = track_schema.dump(track)
-                tracks_obj['tracks'].append(track_data)
-
-            tracks_obj['tracks_count'] = len(tracks_obj['tracks'])
-
-            tracks_response, error = tracks_schema.dump(tracks_obj)
-            return jsonify(tracks_response)
+            return jsonify(_get_tracks_obj(id))
         except Exception as e:
             log.exception('An exception occurred at the get_playlist endpoint.')
             return str(e)
 
     @tracks_blueprint.route('/vote_track', methods=['PUT'])
-    @use_args(PutTrackInputSchema, locations=['querystring', 'json'])
+    @use_args(PutTrackInputSchema)
     def vote_track(req):
         """
         Vote up/down track
@@ -62,10 +48,27 @@ class Tracks:
         vote = req.get('vote')
 
         try:
-            return tracks.vote_track(id, vote)
+            vote_track_response = tracks.vote_track(id, vote)
+            playlist_id = tracks._get_track(id).playlist_id
+            socket_io.emit('VOTED', _get_tracks_obj(playlist_id))
+            return make_response(vote_track_response, 200)
         except Exception as e:
             return make_response(str(e), 500)
 
     @tracks_blueprint.route('/add_track', methods=['POST'])
     def add_track(self):
         pass
+
+
+def _get_tracks_obj(playlist_id):
+    spotify_tracks = tracks.get_tracks(playlist_id)
+    track_schema = TrackSchema()
+    tracks_schema = GetTracksResponseSchema()
+    tracks_obj = {'tracks': []}
+
+    for track in spotify_tracks:
+        track_data, error = track_schema.dump(track)
+        tracks_obj['tracks'].append(track_data)
+
+    tracks_response, error = tracks_schema.dump(tracks_obj)
+    return tracks_response
