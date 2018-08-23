@@ -12,7 +12,7 @@ class PlaylistSchema(Schema):
     id = fields.Str()
     image = fields.Nested(ImageSchema)
     name = fields.Str()
-
+    playlist_id = fields.Str()
 
 class GetPlaylistSchema(Schema):
     playlists = fields.List(fields.Nested(PlaylistSchema))
@@ -42,4 +42,6 @@ class TrackSchema(Schema):
 
 
 class GetTracksResponseSchema(Schema):
+    playlist = fields.Str()
+    tracks_count = fields.Int()
     tracks = fields.List(fields.Nested(TrackSchema))

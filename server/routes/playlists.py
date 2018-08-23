@@ -3,6 +3,7 @@ from flask import Blueprint, jsonify
 from server import settings
 from server.resources import spotify
 from server.models.playlist import Playlist
+from server.lib import playlists
 from server.schemas.spotify import PlaylistSchema, GetPlaylistSchema
 
 playlists_blueprint = Blueprint('playlists', __name__)
@@ -30,20 +31,16 @@ class Playlists:
             ...]
         }
         """
-        get_playlist_endpoint = 'me/playlists'
-        response = spotify.get(settings.API_URL_BASE.format(endpoint=get_playlist_endpoint))
-        playlists_data = response['items']
-
         playlist_schema = PlaylistSchema()
         playlists_schema = GetPlaylistSchema()
-        playlists = {'playlists': []}
+        playlists_obj = {'playlists': []}
 
-        for playlist_item in playlists_data:
-            playlist = Playlist(playlist_item)
+        playlist_docs = playlists.get_playlists()
 
+        for playlist in playlist_docs:
             playlist_data, error = playlist_schema.dump(playlist)
-            playlists['playlists'].append(playlist_data)
+            playlists_obj['playlists'].append(playlist_data)
 
-        playlists_response, error = playlists_schema.dump(playlists)
+        playlists_response, error = playlists_schema.dump(playlists_obj)
 
         return jsonify(playlists_response)

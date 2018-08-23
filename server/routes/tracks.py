@@ -3,6 +3,7 @@ from flask_socketio import SocketIO
 from webargs.flaskparser import use_args
 
 from server.lib import tracks
+from server.lib import playlists
 from server.lib.log import log
 from server.schemas.spotify import (
     GetTracksInputSchema,
