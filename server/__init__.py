@@ -12,5 +12,3 @@ app.register_blueprint(blueprint)
 app.register_blueprint(auth_blueprint)
 app.register_blueprint(playlists_blueprint)
 app.register_blueprint(tracks_blueprint)
-
-socket_io.init_app(app)

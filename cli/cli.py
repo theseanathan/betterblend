@@ -1,4 +1,5 @@
 import random
+import requests
 import string
 import urllib.parse as urllib
 import webbrowser
@@ -18,10 +19,21 @@ def login():
         'state': state,
         'scope': scope,
     }
-    # response = requests.get(url, params=auth_dict)
     redirect_str = url + urllib.urlencode(auth_dict)
     webbrowser.open(redirect_str)
 
 
+def validate() -> bool:
+    res = requests.get('http://localhost:5000/validate')
+    if res.status_code == 200:
+        return res.text == 'SUCCESS'
+    return False
+
+
 if __name__ == '__main__':
     login()
+
+    if not validate():
+        raise Exception('Token validation failed.')
+
+    
