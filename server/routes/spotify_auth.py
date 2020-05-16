@@ -1,9 +1,4 @@
-from flask import (
-    Blueprint,
-    redirect,
-    request
-)
-
+from datetime import datetime, timedelta
 import base64
 import json
 import requests
@@ -11,7 +6,11 @@ import os
 
 from server import client_info
 from server.lib import tokens
-from server.models.tokens import Tokens
+
+from flask import (
+    Blueprint,
+    request
+)
 
 auth_blueprint = Blueprint('spotify_auth', __name__)
 
@@ -42,11 +41,9 @@ def callback():
 
 @auth_blueprint.route('/validate', methods=['GET'])
 def validate():
-    with open(os.path.join(cwd, 'metadata/token.txt'), 'r') as readfile:
-        token_data = json.load(readfile)
-        if 'access_token' in token_data:
-            return 'SUCCESS'
-        return 'FAILURE'
+    valid = tokens.is_token_valid()
+    if valid:
+        return 'SUCCESS'
 
     raise Exception('Token file open fail')
 
@@ -68,6 +65,7 @@ def first_time_save_token(code, state):
         response_content = json.loads(response.content)
         if response.status_code == 200:
             with open(os.path.join(cwd, 'metadata/token.txt'), 'w') as outfile:
+                response_content['expiration'] = str(datetime.now() + timedelta(seconds=response_content['expires_in']))
                 json.dump(response_content, outfile)
             return 'SUCCESS'
         else:

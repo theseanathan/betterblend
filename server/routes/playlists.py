@@ -20,7 +20,7 @@ class Playlists:
             'playlists': [
             {
                 'href': HREF,
-                'id': ID,
+                'tracks': {href, size},
                 'image': {
                     'height': HEIGHT,
                     'width': WIDTH,
@@ -31,16 +31,11 @@ class Playlists:
             ...]
         }
         """
-        playlist_schema = PlaylistSchema()
-        playlists_schema = GetPlaylistSchema()
-        playlists_obj = {'playlists': []}
+        playlists_obj = {}
 
         playlist_docs = playlists.get_playlists()
 
         for playlist in playlist_docs:
-            playlist_data, error = playlist_schema.dump(playlist)
-            playlists_obj['playlists'].append(playlist_data)
+            playlists_obj[playlist['name']] = playlist
 
-        playlists_response, error = playlists_schema.dump(playlists_obj)
-
-        return jsonify(playlists_response)
+        return jsonify(playlists_obj)

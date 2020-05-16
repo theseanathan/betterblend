@@ -8,16 +8,16 @@ def _get_playlists_from_spotify():
     response = spotify.get(settings.API_URL_BASE.format(endpoint=get_playlist_endpoint))
     playlists_data = response['items']
 
+    playlists = []
     for playlist_item in playlists_data:
         playlist = Playlist(**playlist_item)
-        playlist.new_save()
+        playlists.append(playlist.to_log())
+
+    return playlists
 
 
 def get_playlists():
-    _get_playlists_from_spotify()
-    playlists = Playlist.objects()
-
-    return playlists
+    return _get_playlists_from_spotify()
 
 
 def get_playlist_name(playlist_id: str):

@@ -15,6 +15,7 @@ class Playlist(Document):
     meta = {'collection': 'playlists'}
 
     collaborative = BooleanField()
+    description = StringField()
     external_urls = DictField()
     href = StringField()
     id = ObjectIdField(primary_key=True)
@@ -72,8 +73,8 @@ class Playlist(Document):
             'href': self.href,
             'id': self.playlist_id,
             'image': self.image,
-            'mongo_id': self.id,
             'name': self.name,
+            'tracks': self.tracks
         }
         return dict
 
