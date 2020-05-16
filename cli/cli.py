@@ -36,4 +36,4 @@ if __name__ == '__main__':
     if not validate():
         raise Exception('Token validation failed.')
 
-    
+    print('API Validation successful')
