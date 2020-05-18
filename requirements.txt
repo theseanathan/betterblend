@@ -25,4 +25,4 @@ requests==2.3.0
 six==1.11.0
 wcwidth==0.1.9
 webargs==3.0.1
-Werkzeug==0.14.1
+Werkzeug==0.15.3
