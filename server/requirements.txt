@@ -19,5 +19,5 @@ python-engineio==2.2.0
 python-socketio==2.0.0
 requests==2.3.0
 six==1.11.0
-webargs==3.0.1
+webargs==5.1.3
 Werkzeug==0.14.1
